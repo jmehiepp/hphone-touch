@@ -26,4 +26,3 @@ after-stage::
 	mkdir -p $(THEOS_STAGING_DIR)/usr/share/hphone-touch/licenses
 	cp vendor/lua/src/lua.h $(THEOS_STAGING_DIR)/usr/share/hphone-touch/licenses/Lua.txt
 	cp LICENSE $(THEOS_STAGING_DIR)/usr/share/hphone-touch/licenses/HPhoneTouch.txt
-	chmod 755 $(THEOS_STAGING_DIR)/DEBIAN/postinst $(THEOS_STAGING_DIR)/DEBIAN/prerm

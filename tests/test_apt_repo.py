@@ -14,12 +14,14 @@ spec = importlib.util.spec_from_file_location("apt_repo", Path(__file__).resolve
 apt = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(apt)
 
-def tar(files):
+def tar(files, executable_scripts=True):
     out = io.BytesIO()
     with tarfile.open(fileobj=out, mode="w:gz") as archive:
         for name, data in files.items():
             info = tarfile.TarInfo(name)
             info.size = len(data)
+            if name in ("postinst", "prerm") and executable_scripts:
+                info.mode = 0o755
             archive.addfile(info, io.BytesIO(data))
     return out.getvalue()
 
@@ -29,7 +31,7 @@ def ar(files):
         out += f"{name+'/':<16}{0:<12}{0:<6}{0:<6}{'100644':<8}{len(data):<10}`\n".encode()+data+(b"\n" if len(data)%2 else b"")
     return out
 
-def fixture(cpu_subtype=0, minimum=15<<16):
+def fixture(cpu_subtype=0, minimum=15<<16, executable_scripts=True):
     # Structural Mach-O header only: these fixtures are not executable packages.
     binary = struct.pack("<8I", 0xfeedfacf, 0x0100000c, cpu_subtype, 2, 1, 24, 0, 0)+struct.pack("<6I", 0x32, 24, 2, minimum, 26<<16, 0)
     payload = {"usr/bin/hphone-touchd":binary, "Applications/HPhoneTouch.app/HPhoneTouch":binary,
@@ -40,7 +42,7 @@ def fixture(cpu_subtype=0, minimum=15<<16):
         payload["usr/share/hphone-touch/web/"+name] = b"fixture"
     control = {"control":f"Package: {apt.PACKAGE}\nVersion: 0.1.0\nArchitecture: iphoneos-arm64e\nDescription: fixture\n".encode(),
                "postinst":b"#!/bin/sh\nexit 0\n", "prerm":b"#!/bin/sh\nexit 0\n"}
-    return ar({"debian-binary":b"2.0\n", "control.tar.gz":tar(control), "data.tar.gz":tar(payload)})
+    return ar({"debian-binary":b"2.0\n", "control.tar.gz":tar(control, executable_scripts), "data.tar.gz":tar(payload)})
 
 class AptTests(unittest.TestCase):
     def test_index_hashes_and_roundtrip(self):
@@ -67,6 +69,13 @@ class AptTests(unittest.TestCase):
     def test_rejects_truncated_archive(self):
         with self.assertRaises(ValueError):
             list(apt.ar_members(fixture()[:-10]))
+
+    def test_rejects_nonexecutable_maintainer_scripts(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder)/"fixture.deb"
+            path.write_bytes(fixture(executable_scripts=False))
+            with self.assertRaises(ValueError):
+                apt.validate_deb(path)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

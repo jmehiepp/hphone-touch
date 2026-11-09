@@ -105,6 +105,10 @@ def validate_deb(path):
     for script in ("postinst", "prerm"):
         if script not in control or b"\r" in control[script] or not control[script].startswith(b"#!/bin/sh\n"):
             raise ValueError(f"Missing/invalid maintainer script: {script}")
+    with tarfile.open(fileobj=io.BytesIO(control_blob), mode="r:*") as archive:
+        for member in archive.getmembers():
+            if member.name.removeprefix("./") in ("postinst", "prerm") and member.mode & 0o111 == 0:
+                raise ValueError("Maintainer scripts must be executable")
     return metadata
 
 def generate(packages, dest):

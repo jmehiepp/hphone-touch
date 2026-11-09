@@ -12,7 +12,7 @@
     if(token.length<32){[self retry];return;}
     NSData *encoded=[NSJSONSerialization dataWithJSONObject:@[token] options:0 error:NULL];
     NSString *json=[[NSString alloc] initWithData:encoded encoding:NSUTF8StringEncoding];
-    NSString *script=[NSString stringWithFormat:@"window.HPHONE_TOKEN=(%@)[0];",json];
+    NSString *script=[NSString stringWithFormat:@"if(location.origin==='http://127.0.0.1:8765'){window.HPHONE_TOKEN=(%@)[0];}",json];
     [self.web.configuration.userContentController removeAllUserScripts];
     [self.web.configuration.userContentController addUserScript:[[WKUserScript alloc] initWithSource:script injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES]];
     [self.web loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://127.0.0.1:8765/"]]];
