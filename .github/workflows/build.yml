@@ -1,0 +1,61 @@
+name: Build RootHide package and publish APT
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: hphone-apt
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build dependencies
+        run: brew install make ldid
+      - name: Install pinned RootHide Theos
+        env:
+          THEOS: ${{ runner.temp }}/theos
+        run: |
+          git clone https://github.com/roothide/theos.git "$THEOS"
+          git -C "$THEOS" checkout 958fea4f779943505b15b93c88bb4db8d97b346d
+          git -C "$THEOS" submodule update --init --recursive
+          git -C "$THEOS" rev-parse HEAD
+          mkdir -p "$THEOS/sdks"
+          ln -s "$(xcrun --sdk iphoneos --show-sdk-path)" "$THEOS/sdks/iPhoneOS$(xcrun --sdk iphoneos --show-sdk-version).sdk"
+      - name: Verify Lua and build ARM64 iOS 15 package
+        env:
+          THEOS: ${{ runner.temp }}/theos
+        run: |
+          python3 scripts/fetch_lua.py
+          python3 tests/test_apt_repo.py
+          node --check web/app.js
+          mkdir -p "$RUNNER_TEMP/lua-objects"
+          for source in vendor/lua/src/*.c; do
+            [ "$(basename "$source")" = lua.c ] && continue
+            [ "$(basename "$source")" = luac.c ] && continue
+            xcrun clang -c -DLUA_USE_POSIX -Ivendor/lua/src "$source" -o "$RUNNER_TEMP/lua-objects/$(basename "$source" .c).o"
+          done
+          xcrun clang -fobjc-arc -fblocks -DHP_HOST_TEST -Idaemon -Ivendor/lua/src -framework Foundation daemon/main.m tests/BridgeStub.m "$RUNNER_TEMP"/lua-objects/*.o -o "$RUNNER_TEMP/hphone-host-test"
+          python3 tests/test_daemon.py "$RUNNER_TEMP/hphone-host-test"
+          gmake package FINALPACKAGE=1 -j2
+      - name: Validate native payload and generate repository
+        run: python3 scripts/apt_repo.py packages repo-out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HPhoneTouch-RootHide
+          path: packages/*.deb
+          if-no-files-found: error
+      - name: Publish only validated packages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git -C repo-out init -b gh-pages
+          git -C repo-out config user.name github-actions[bot]
+          git -C repo-out config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git -C repo-out add .
+          git -C repo-out commit -m "Publish validated HPhone Touch $GITHUB_SHA"
+          git -C repo-out remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git -C repo-out push --force origin gh-pages

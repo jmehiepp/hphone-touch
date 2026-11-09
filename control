@@ -1,0 +1,11 @@
+Package: io.github.jmehiepp.hphone-touch
+Name: HPhone Touch
+Version: 0.1.0
+Architecture: iphoneos-arm64e
+Description: Lua automation, script editor and device bridge for owner-managed iPhones. Experimental first release.
+Maintainer: jmehiepp
+Author: HPhone Touch contributors
+Section: Utilities
+Depends: firmware (>= 15.0)
+Conflicts: io.github.jmehiepp.hphone-touch-rootless
+Homepage: https://github.com/jmehiepp/hphone-touch

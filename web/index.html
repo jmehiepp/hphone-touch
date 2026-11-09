@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HPhone Touch</title><link rel="stylesheet" href="/style.css"><script defer src="/app.js"></script></head>
+<body>
+<header><div><strong>HPhone Touch</strong><span class="badge">0.1 · thử nghiệm</span></div><span id="status">Đang kết nối…</span></header>
+<main>
+<section id="connect" hidden><h2>Kết nối</h2><p>Nhập token của thiết bị khi truy cập qua USB từ PC.</p><input id="token" type="password" autocomplete="off" placeholder="Token thiết bị"><button id="login">Kết nối</button></section>
+<section class="editor"><div class="toolbar"><select id="files" aria-label="Script"></select><button id="new">Mới</button><button id="delete">Xóa</button></div><div class="filename"><input id="name" placeholder="hello.lua" aria-label="Tên script"><button id="save">Lưu</button></div><textarea id="code" spellcheck="false" aria-label="Mã Lua"></textarea><div class="toolbar"><button id="run" class="primary">▶ Lưu & chạy</button><button id="stop">■ Dừng</button><span>Lua 5.4.9</span></div></section>
+<section class="device"><h2>Thiết bị</h2><p class="hint">Chạm lên ảnh để gửi tọa độ pixel. Kiểm tra máy thử trước khi chạy hàng loạt.</p><div class="toolbar"><button id="screen">Chụp màn hình</button><button id="ocr">Đọc chữ</button><button data-key="home">Home</button><button data-key="power">Nguồn</button></div><img id="preview" alt="Ảnh màn hình iPhone" hidden><pre id="ocrResult"></pre><details><summary>Khả năng của cầu native</summary><pre id="capabilities"></pre></details></section>
+<section class="log"><div class="toolbar"><h2>Nhật ký</h2><button id="clear">Xóa hiển thị</button></div><pre id="logs" aria-live="polite"></pre></section>
+<section class="help"><h2>Lua API bản đầu</h2><p><code>print(...)</code>, <code>log(...)</code>, <code>sleep(seconds)</code>, <code>tap(x, y)</code>, <code>key('home')</code>, <code>screenshot()</code> → chuỗi PNG, <code>ocr()</code> → bảng kết quả.</p><p>Tọa độ chạm theo pixel ảnh gốc, hướng dọc. OCR trả hộp chuẩn hóa 0–1, gốc trái dưới. Phím: home, power, volumeUp, volumeDown. Script có quyền của tài khoản mobile; chỉ chạy mã bạn tin cậy.</p><p>API native chưa được xác nhận trên mọi máy. Bản này chưa có tìm ảnh, swipe, vòng lặp đa thiết bị, cookie, keychain hoặc sao lưu/khôi phục app.</p></section>
+</main><div id="notice" role="status" hidden></div>
+</body></html>

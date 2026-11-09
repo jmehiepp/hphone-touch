@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+case "$1" in
+  remove|upgrade|deconfigure)
+    launchctl unload /Library/LaunchDaemons/io.github.jmehiepp.hphone-touch.plist 2>/dev/null || true
+    ;;
+esac
+# Preserve scripts and device token on uninstall.
+exit 0
