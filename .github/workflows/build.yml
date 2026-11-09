@@ -5,12 +5,17 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  pages: write
+  id-token: write
 concurrency:
   group: hphone-apt
   cancel-in-progress: false
 jobs:
   build:
     runs-on: macos-15
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - name: Install build dependencies
@@ -59,3 +64,10 @@ jobs:
           git -C repo-out commit -m "Publish validated HPhone Touch $GITHUB_SHA"
           git -C repo-out remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git -C repo-out push --force origin gh-pages
+      - name: Upload validated APT site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: repo-out
+      - name: Deploy APT to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

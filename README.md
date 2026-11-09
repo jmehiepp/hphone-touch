@@ -65,7 +65,7 @@ python3 scripts/apt_repo.py packages repo-out
 
 Lua tải từ repo chính thức `lua/lua`, commit của tag 5.4.9 và SHA256 được ghim trước khi giải nén. Theos cũng ghim commit, dùng SDK iPhoneOS của Xcode. Pipeline kiểm tra ARM64 ALL (không yêu cầu CPU ARM64e), minimum iOS ≤15.0, plist, launch daemon, maintainer script, web và giấy phép trước khi publish. Tên kiến trúc Debian `iphoneos-arm64e` là quy ước RootHide, không phải yêu cầu chip A12.
 
-GitHub Actions ghi kho phẳng vào nhánh `gh-pages`. GitHub Pages phải được bật cho nhánh đó. Pipeline chỉ publish khi compile và kiểm gói thành công; chưa thay thế kiểm thử runtime trên iPhone. Theo [API RootHide chính thức](https://github.com/roothide/Developer), code native gọi `jbroot()` khi đọc tài nguyên bootstrap; script/plist dùng đường dẫn jbroot. Không sửa bootstrap hay gỡ jailbreak khi cài tool.
+GitHub Actions ghi bản kho phẳng vào nhánh `gh-pages` và triển khai trực tiếp qua `deploy-pages`; Pages chọn nguồn **GitHub Actions**. Pipeline chỉ publish khi compile và kiểm gói thành công; chưa thay thế kiểm thử runtime trên iPhone. Theo [API RootHide chính thức](https://github.com/roothide/Developer), code native gọi `jbroot()` khi đọc tài nguyên bootstrap; script/plist dùng đường dẫn jbroot. Không sửa bootstrap hay gỡ jailbreak khi cài tool.
 
 ## Giấy phép
 
