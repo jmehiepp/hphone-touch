@@ -31,6 +31,7 @@ static void *limitedAlloc(void *ud,void *ptr,size_t oldSize,size_t newSize) {
 }
 
 static void logLine(NSString *message) {
+    if(message.length>4096)message=[[message substringToIndex:4096] stringByAppendingString:@" … [truncated]"];
     [lock lock]; [logs addObject:@{@"id":@(++sequence),@"text":message?:@""}];
     if(logs.count>500)[logs removeObjectAtIndex:0]; [lock unlock];
 }
@@ -42,20 +43,20 @@ static NSString *scriptPath(id name) {
     if(lstat(path.fileSystemRepresentation,&s)==0 && !S_ISREG(s.st_mode))return nil;
     return path;
 }
-static int lprint(lua_State *L) {
+static int lprint(lua_State *L) { @autoreleasepool {
     NSMutableArray *parts=[NSMutableArray array];
     for(int i=1;i<=lua_gettop(L);i++){size_t n;const char *s=luaL_tolstring(L,i,&n);[parts addObject:[[NSString alloc] initWithBytes:s length:n encoding:NSUTF8StringEncoding]?:@"<binary>"];lua_pop(L,1);}
     logLine([parts componentsJoinedByString:@"\t"]); return 0;
-}
+}}
 static void stopHook(lua_State *L,lua_Debug *ar) { if(atomic_load(&cancelled))luaL_error(L,"Stopped by user"); }
 static int lsleep(lua_State *L) {
     double sec=luaL_checknumber(L,1); if(!isfinite(sec)||sec<0||sec>86400)return luaL_error(L,"sleep expects 0..86400 seconds");
     while(sec>0){if(atomic_load(&cancelled))return luaL_error(L,"Stopped by user");double step=fmin(sec,.05);usleep((useconds_t)(step*1000000));sec-=step;}return 0;
 }
-static int ltap(lua_State *L){double x=luaL_checknumber(L,1),y=luaL_checknumber(L,2);if(!HPTap(x,y))return luaL_error(L,"Touch bridge unavailable, or coordinates outside screen");return 0;}
-static int lkey(lua_State *L){const char *key=luaL_checkstring(L,1);if(!HPKey([NSString stringWithUTF8String:key]))return luaL_error(L,"Key bridge unavailable or unknown key");return 0;}
-static int lscreenshot(lua_State *L){NSData *png=HPScreenshot();if(!png)return luaL_error(L,"Screen capture unavailable");lua_pushlstring(L,png.bytes,png.length);return 1;}
-static int locr(lua_State *L){NSArray *items=HPOCR();if(!items)return luaL_error(L,"OCR or screen capture unavailable");lua_newtable(L);int i=0;for(NSDictionary *row in items){lua_newtable(L);for(NSString *key in row){id v=row[key];if([v isKindOfClass:NSString.class])lua_pushstring(L,[v UTF8String]);else lua_pushnumber(L,[v doubleValue]);lua_setfield(L,-2,key.UTF8String);}lua_rawseti(L,-2,++i);}return 1;}
+static int ltap(lua_State *L){double x=luaL_checknumber(L,1),y=luaL_checknumber(L,2);BOOL ok;@autoreleasepool{ok=HPTap(x,y);}if(!ok)return luaL_error(L,"Touch bridge unavailable, or coordinates outside screen");return 0;}
+static int lkey(lua_State *L){const char *key=luaL_checkstring(L,1);BOOL ok;@autoreleasepool{ok=HPKey([NSString stringWithUTF8String:key]);}if(!ok)return luaL_error(L,"Key bridge unavailable or unknown key");return 0;}
+static int lscreenshot(lua_State *L){BOOL ok;@autoreleasepool{NSData *png=HPScreenshot();ok=png!=nil;if(ok)lua_pushlstring(L,png.bytes,png.length);}if(!ok)return luaL_error(L,"Screen capture unavailable");return 1;}
+static int locr(lua_State *L){BOOL ok;@autoreleasepool{NSArray *items=HPOCR();ok=items!=nil;if(ok){lua_newtable(L);int i=0;for(NSDictionary *row in items){lua_newtable(L);for(NSString *key in row){id v=row[key];if([v isKindOfClass:NSString.class])lua_pushstring(L,[v UTF8String]);else lua_pushnumber(L,[v doubleValue]);lua_setfield(L,-2,key.UTF8String);}lua_rawseti(L,-2,++i);}}}if(!ok)return luaL_error(L,"OCR or screen capture unavailable");return 1;}
 static void runScript(NSData *source,NSString *name) {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED,0),^{ @autoreleasepool {
         size_t allocated=0;lua_State *L=lua_newstate(limitedAlloc,&allocated);
