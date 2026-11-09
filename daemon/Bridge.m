@@ -1,6 +1,5 @@
 #import "Bridge.h"
-#import <UIKit/UIKit.h>
-#import <IOSurface/IOSurface.h>
+#import "IOSurfaceCompat.h"
 #import <Vision/Vision.h>
 #import <ImageIO/ImageIO.h>
 #import <dlfcn.h>
@@ -38,7 +37,7 @@ static CGImageRef capture(void) {
     setup(); if(!mainDisplay||!surfaceForLayer) return NULL;
     IOSurfaceRef s=NULL;
     if(!displayConnection||surfaceForLayer(displayConnection,0,&s)||!s) return NULL;
-    if(IOSurfaceLock(s,kIOSurfaceLockReadOnly,NULL)!=kIOReturnSuccess)return NULL;
+    if(IOSurfaceLock(s,kIOSurfaceLockReadOnly,NULL)!=0)return NULL;
     size_t w=IOSurfaceGetWidth(s),h=IOSurfaceGetHeight(s),row=IOSurfaceGetBytesPerRow(s);
     CGImageRef image=NULL;
     if(w&&h&&w<16384&&h<16384&&row>=w*4&&row<128*1024*1024/h&&IOSurfaceGetBaseAddress(s)) {
