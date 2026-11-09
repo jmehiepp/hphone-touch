@@ -15,6 +15,7 @@ include $(THEOS_MAKE_PATH)/tool.mk
 APPLICATION_NAME = HPhoneTouch
 HPhoneTouch_FILES = app/main.m
 HPhoneTouch_RESOURCE_FILES = app/Info.plist
+HPhoneTouch_RESOURCE_DIRS = app/Resources
 HPhoneTouch_FRAMEWORKS = UIKit WebKit Foundation
 HPhoneTouch_CFLAGS = -fobjc-arc
 HPhoneTouch_CODESIGN_FLAGS = -Sentitlements.plist
