@@ -1,6 +1,8 @@
 // Minimal C declarations for iPhoneOS SDKs without the IOSurface umbrella header.
 // ABI references: Apple's IOSurfaceGet* / IOSurfaceLock documentation.
-#if __has_include(<IOSurface/IOSurface.h>)
+#if __has_include(<IOSurface/IOSurfaceRef.h>)
+#import <IOSurface/IOSurfaceRef.h>
+#elif __has_include(<IOSurface/IOSurface.h>)
 #import <IOSurface/IOSurface.h>
 #else
 #include <stdint.h>
