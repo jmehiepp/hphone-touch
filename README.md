@@ -44,6 +44,8 @@ for _, row in ipairs(text) do print(row.text) end
 
 OCR dùng tọa độ chuẩn hóa 0–1, gốc trái dưới. Chạm gửi sự kiện IOHID không xác nhận app đích đã nhận. Cầu không dùng được sẽ báo lỗi rõ. Dừng dựa trên hook Lua và `sleep`; không ngắt cưỡng bức hàm C đang chờ hay tiến trình do script tự mở. Lua mở thư viện chuẩn, script chạy với quyền `mobile`; chỉ chạy script tin cậy. Không cấp quyền root cho daemon.
 
+Lua được biên dịch với `LUA_USE_IOS`; `os.execute` không khả dụng theo cấu hình iOS chính thức của Lua. Giới hạn heap Lua là 32 MiB mỗi lần chạy; log giữ tối đa 500 dòng, mỗi dòng 4096 ký tự.
+
 ## Truy cập từ PC
 
 Daemon chỉ nghe `127.0.0.1:8765`, không mở LAN. Mọi API yêu cầu header `X-HPhone-Token`; token riêng thiết bị lưu quyền `0600` ở `/var/mobile/Library/HPhoneTouch/token`. App iPhone đọc token trực tiếp. Từ PC có thể chuyển tiếp USB đến cổng 8765, mở `http://127.0.0.1:8765` và nhập token vào giao diện. Token giữ trong sessionStorage của tab. Hiện chưa tích hợp chuyển tiếp hay lấy token tự động vào RootHideFleet.

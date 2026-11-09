@@ -36,7 +36,7 @@ jobs:
           for source in vendor/lua/src/*.c; do
             [ "$(basename "$source")" = lua.c ] && continue
             [ "$(basename "$source")" = luac.c ] && continue
-            xcrun clang -c -DLUA_USE_POSIX -Ivendor/lua/src "$source" -o "$RUNNER_TEMP/lua-objects/$(basename "$source" .c).o"
+            xcrun clang -c -DLUA_USE_IOS -Ivendor/lua/src "$source" -o "$RUNNER_TEMP/lua-objects/$(basename "$source" .c).o"
           done
           xcrun clang -fobjc-arc -fblocks -DHP_HOST_TEST -Idaemon -Ivendor/lua/src -framework Foundation daemon/main.m tests/BridgeStub.m "$RUNNER_TEMP"/lua-objects/*.o -o "$RUNNER_TEMP/hphone-host-test"
           python3 tests/test_daemon.py "$RUNNER_TEMP/hphone-host-test"

@@ -5,7 +5,7 @@ FINALPACKAGE = 1
 include $(THEOS)/makefiles/common.mk
 TOOL_NAME = hphone-touchd
 hphone-touchd_FILES = daemon/main.m daemon/Bridge.m $(filter-out vendor/lua/src/lua.c vendor/lua/src/luac.c,$(wildcard vendor/lua/src/*.c))
-hphone-touchd_CFLAGS = -Ivendor/lua/src -Idaemon -DLUA_USE_POSIX -Wno-deprecated-declarations
+hphone-touchd_CFLAGS = -Ivendor/lua/src -Idaemon -DLUA_USE_IOS -Wno-deprecated-declarations
 hphone-touchd_OBJCFLAGS = -fobjc-arc
 hphone-touchd_LDFLAGS = -lroothide
 hphone-touchd_FRAMEWORKS = Foundation UIKit CoreGraphics IOSurface Vision ImageIO IOKit
