@@ -166,9 +166,12 @@ static NSString *fileHash(NSString *path,NSError **error) {
 // Only ordinary files/directories are backed up. No symlinks, sockets, metadata files,
 // app bundles, shared groups, or keychain records are traversed.
 static NSArray *inventory(NSString *root,BOOL source,NSError **error) {
+    // NSURL enumeration resolves /var and similar parent aliases on Darwin.
+    // Compare against the same canonical root for source and backup payloads.
+    root=canonical(root);if(!root)return nil;
     NSFileManager *fm=NSFileManager.defaultManager;NSMutableArray *result=[NSMutableArray new];
-    __block BOOL enumerationFailed=NO;
-    NSDirectoryEnumerator *walk=[fm enumeratorAtURL:[NSURL fileURLWithPath:root] includingPropertiesForKeys:nil options:0 errorHandler:^BOOL(NSURL *url,NSError *problem){enumerationFailed=YES;if(error)*error=problem;return NO;}];
+    __block NSError *enumerationError=nil;
+    NSDirectoryEnumerator *walk=[fm enumeratorAtURL:[NSURL fileURLWithPath:root] includingPropertiesForKeys:nil options:0 errorHandler:^BOOL(NSURL *url,NSError *problem){enumerationError=problem;return NO;}];
     if(!walk)return nil;NSURL *entryURL;uint64_t total=0;
     while((entryURL=walk.nextObject)){
         NSString *full=entryURL.path;NSString *prefix=[root stringByAppendingString:@"/"];
@@ -185,7 +188,7 @@ static NSArray *inventory(NSString *root,BOOL source,NSError **error) {
         if(S_ISREG(st.st_mode)){NSString *hash=fileHash(path,error);if(!hash)return nil;row[@"sha256"]=hash;}
         [result addObject:row];
     }
-    if(enumerationFailed)return nil;
+    if(enumerationError){if(error)*error=enumerationError;return nil;}
     return [result sortedArrayUsingComparator:^NSComparisonResult(NSDictionary *a,NSDictionary *b){return [a[@"path"] compare:b[@"path"]];}];
 }
 static BOOL copyEntries(NSString *source,NSString *destination,NSArray *entries,NSError **error) {
@@ -240,6 +243,8 @@ static NSDictionary *loadBackup(NSString *identifier,NSString *name,NSString **f
 static NSDictionary *replaceData(NSString *identifier,NSString *name,BOOL wipe) {
     NSString *errorText=nil,*container=containerFor(identifier,&errorText);if(!container)return failure(@"container",errorText);
     NSFileManager *fm=NSFileManager.defaultManager;NSError *error=nil;NSString *backup=nil;NSDictionary *manifest=nil;
+    NSString *journal=[container stringByAppendingPathComponent:@".hphone-transaction.json"];struct stat journalStat;
+    if(lstat(journal.fileSystemRepresentation,&journalStat)==0||errno!=ENOENT)return failure(@"recovery",@"An earlier app-data transaction requires recovery; old data was retained");
     if(!wipe){manifest=loadBackup(identifier,name,&backup);if(!manifest)return failure(@"manifest",@"Backup is missing or has an invalid manifest");}
     NSArray *current=inventory(container,YES,&error);if(!current)return failure(@"inventory",error.localizedDescription);
     NSString *transaction=NSUUID.UUID.UUIDString,*stage=[container stringByAppendingPathComponent:[@".hphone-new-" stringByAppendingString:transaction]],*old=[container stringByAppendingPathComponent:[@".hphone-old-" stringByAppendingString:transaction]];
@@ -255,7 +260,6 @@ static NSDictionary *replaceData(NSString *identifier,NSString *name,BOOL wipe) 
     NSMutableOrderedSet *names=[NSMutableOrderedSet new];for(NSDictionary *row in current)[names addObject:[row[@"path"] pathComponents].firstObject];
     for(NSDictionary *row in entries)if(relativeSafe(row[@"path"]))[names addObject:[row[@"path"] pathComponents].firstObject];
     NSMutableArray *movedOld=[NSMutableArray new],*movedNew=[NSMutableArray new];
-    NSString *journal=[container stringByAppendingPathComponent:@".hphone-transaction.json"];
     if([fm fileExistsAtPath:journal]){[fm removeItemAtPath:stage error:NULL];[fm removeItemAtPath:old error:NULL];return failure(@"recovery",@"An earlier app-data transaction requires recovery; old data was retained");}
     NSDictionary *record=@{@"bundleId":identifier,@"id":transaction,@"old":old.lastPathComponent,@"new":stage.lastPathComponent,@"names":names.array};
     NSData *journalBytes=[NSJSONSerialization dataWithJSONObject:record options:0 error:&error];

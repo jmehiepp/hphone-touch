@@ -71,6 +71,7 @@ class ServicesTests(unittest.TestCase):
         result = self.call("backupApp", bundleId="com.example.owned", name="first")
         self.assertTrue(result["ok"], result)
         self.assertFalse(result["value"]["hasKeychain"])
+        self.assert_payload_matches_manifest(Path(result["value"]["path"]))
         (self.app / "Documents/state.txt").write_text("changed")
         self.assertFalse(self.call("restoreApp", bundleId="com.example.owned", name="first")["ok"])
         restored = self.call("restoreApp", bundleId="com.example.owned", name="first", confirmBundle="com.example.owned")
@@ -85,6 +86,39 @@ class ServicesTests(unittest.TestCase):
         self.assertTrue(recovery["ok"], recovery)
         self.assertEqual((self.app / "Documents/state.txt").read_text(), "owned test data")
         self.assertGreaterEqual(len(self.call("listBackups", bundleId="com.example.owned")["value"]), 4)
+
+    def assert_payload_matches_manifest(self, folder):
+        import hashlib
+        import stat
+        manifest = json.loads((folder / "manifest.json").read_text())
+        root = folder / "data"
+        self.assertEqual({p.relative_to(root).as_posix() for p in root.rglob("*")}, {row["path"] for row in manifest["entries"]})
+        for row in manifest["entries"]:
+            path = root / row["path"]
+            actual = path.stat()
+            self.assertEqual(stat.S_ISDIR(actual.st_mode), bool(row["directory"]), row)
+            self.assertEqual(stat.S_IMODE(actual.st_mode), row["mode"], row)
+            if not row["directory"]:
+                self.assertEqual(actual.st_size, row["size"], row)
+                self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), row["sha256"], row)
+
+    def test_backup_restore_through_parent_path_alias(self):
+        # macOS /var -> /private/var and user-chosen aliases must yield the same
+        # relative manifest paths when NSURL canonicalizes enumeration roots.
+        self.proc.stdin.close()
+        self.proc.wait(timeout=5)
+        self.proc.stdout.close()
+        alias = self.root / "parent-alias"
+        alias.symlink_to(self.root, target_is_directory=True)
+        env = dict(os.environ, HPHONE_TEST_DATA=str(alias / "HPhoneTouch"), HPHONE_TEST_CONTAINERS=str(self.containers), HPHONE_TEST_APPS=str(self.mapfile), HPHONE_TEST_COOKIE_FILE=str(self.cookiefile))
+        self.proc = subprocess.Popen([sys.argv[1]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, env=env)
+        saved = self.call("backupApp", bundleId="com.example.owned", name="alias")
+        self.assertTrue(saved["ok"], saved)
+        self.assert_payload_matches_manifest(Path(saved["value"]["path"]))
+        (self.app / "Documents/state.txt").write_text("changed")
+        restored = self.call("restoreApp", bundleId="com.example.owned", name="alias", confirmBundle="com.example.owned")
+        self.assertTrue(restored["ok"], restored)
+        self.assertEqual((self.app / "Documents/state.txt").read_text(), "owned test data")
 
     def test_tampered_backup_does_not_replace_data(self):
         first = self.call("backupApp", bundleId="com.example.owned", name="first")
