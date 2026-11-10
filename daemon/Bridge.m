@@ -2,6 +2,7 @@
 #import "IOSurfaceCompat.h"
 #import <Vision/Vision.h>
 #import <ImageIO/ImageIO.h>
+#import <CoreImage/CoreImage.h>
 #import <dlfcn.h>
 #import <mach/mach_time.h>
 #import <unistd.h>
@@ -99,10 +100,10 @@ NSDictionary *HPCapabilities(void) {
     NSDictionary *diagnostics;setup();@synchronized(captureLock){diagnostics=screenDiagnostics?:@{@"stage":@"notTried"};}
     setup(); return @{@"lua":@YES,@"scripts":@YES,@"screenBridgePresent":@(mainDisplay&&surfaceForLayer),
         @"touchBridgePresent":@(client&&digitizer&&finger&&appendEvent&&dispatchEvent),@"keyBridgePresent":@(client&&keyboard&&dispatchEvent),
-        @"screenLastCheck":diagnostics,@"ocrMode":@"fast-cpu",@"deviceValidation":@"required",@"version":@"0.1.7"};
+        @"screenLastCheck":diagnostics,@"ocrMode":@"fast-cpu",@"deviceValidation":@"required",@"version":@"0.1.8"};
 }
 NSData *HPScreenshot(void) {
-    CGImageRef image=capture(); if(!image) return nil;
+    NSData *png=HPScreenshot(); if(!png)return nil;
     NSMutableData *data=[NSMutableData data]; CGImageDestinationRef dst=CGImageDestinationCreateWithData((__bridge CFMutableDataRef)data,CFSTR("public.png"),1,NULL);
     if(!dst) {CGImageRelease(image);return nil;} CGImageDestinationAddImage(dst,image,NULL);
     BOOL ok=CGImageDestinationFinalize(dst); CFRelease(dst); CGImageRelease(image); return ok?data:nil;
@@ -116,9 +117,10 @@ NSArray *HPOCR(void) {
     VNRecognizeTextRequest *request=[VNRecognizeTextRequest new]; request.recognitionLevel=VNRequestTextRecognitionLevelFast;
     request.usesCPUOnly=YES;
     traceStage("OCR handler init\n");
-    VNImageRequestHandler *handler=[[VNImageRequestHandler alloc] initWithCGImage:image options:@{}]; NSError *error=nil;
+    CIContext *context=[CIContext contextWithOptions:@{kCIContextUseSoftwareRenderer:@YES}];
+    VNImageRequestHandler *handler=[[VNImageRequestHandler alloc] initWithData:png options:@{VNImageOptionCIContext:context}]; NSError *error=nil;
     traceStage("OCR perform\n");
-    BOOL ok=[handler performRequests:@[request] error:&error]; CGImageRelease(image); if(!ok)return nil;
+    BOOL ok=[handler performRequests:@[request] error:&error];if(!ok)return nil;
     traceStage("OCR results\n");
     NSMutableArray *items=[NSMutableArray array];
     for(VNRecognizedTextObservation *ob in request.results) {
