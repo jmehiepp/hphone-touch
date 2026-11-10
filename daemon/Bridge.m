@@ -87,7 +87,7 @@ NSDictionary *HPCapabilities(void) {
     NSDictionary *diagnostics;setup();@synchronized(captureLock){diagnostics=screenDiagnostics?:@{@"stage":@"notTried"};}
     setup(); return @{@"lua":@YES,@"scripts":@YES,@"screenBridgePresent":@(mainDisplay&&surfaceForLayer),
         @"touchBridgePresent":@(client&&digitizer&&finger&&appendEvent&&dispatchEvent),@"keyBridgePresent":@(client&&keyboard&&dispatchEvent),
-        @"screenLastCheck":diagnostics,@"deviceValidation":@"required",@"version":@"0.1.5"};
+        @"screenLastCheck":diagnostics,@"ocrMode":@"fast-cpu",@"deviceValidation":@"required",@"version":@"0.1.6"};
 }
 NSData *HPScreenshot(void) {
     CGImageRef image=capture(); if(!image) return nil;
@@ -99,7 +99,7 @@ NSArray *HPOCR(void) {
     setup();if(![ocrLock tryLock])return nil;
     @try {
     CGImageRef image=capture(); if(!image) return nil;
-    VNRecognizeTextRequest *request=[VNRecognizeTextRequest new]; request.recognitionLevel=VNRequestTextRecognitionLevelAccurate;
+    VNRecognizeTextRequest *request=[VNRecognizeTextRequest new]; request.recognitionLevel=VNRequestTextRecognitionLevelFast;
     request.usesCPUOnly=YES;
     VNImageRequestHandler *handler=[[VNImageRequestHandler alloc] initWithCGImage:image options:@{}]; NSError *error=nil;
     BOOL ok=[handler performRequests:@[request] error:&error]; CGImageRelease(image); if(!ok)return nil;

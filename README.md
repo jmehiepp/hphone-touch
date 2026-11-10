@@ -1,6 +1,6 @@
 # HPhone Touch
 
-Công cụ tự động hóa Lua độc lập cho iPhone dùng Dopamine RootHide. Mục tiêu đầu tiên: iPhone 6s (ARM64), iOS 15.x. **0.1.5 là bản thử nghiệm, đang kiểm tra trên thiết bị. Không tuyên bố tương đương đầy đủ HBTouch.**
+Công cụ tự động hóa Lua độc lập cho iPhone dùng Dopamine RootHide. Mục tiêu đầu tiên: iPhone 6s (ARM64), iOS 15.x. **0.1.6 là bản thử nghiệm, đang kiểm tra trên thiết bị. Không tuyên bố tương đương đầy đủ HBTouch.**
 
 Kho Sileo dự kiến: `https://jmehiepp.github.io/hphone-touch/`. Chỉ có gói sau khi GitHub Actions build và kiểm tra thành công. Đây là kho APT riêng, Sileo là ứng dụng đọc kho. Release hiện chưa ký GPG.
 
@@ -43,6 +43,8 @@ for _, row in ipairs(text) do print(row.text) end
 ```
 
 OCR dùng tọa độ chuẩn hóa 0–1, gốc trái dưới. Chạm gửi sự kiện IOHID không xác nhận app đích đã nhận. Cầu không dùng được sẽ báo lỗi rõ. Dừng dựa trên hook Lua và `sleep`; không ngắt cưỡng bức hàm C đang chờ hay tiến trình do script tự mở. Lua mở thư viện chuẩn, script chạy với quyền `mobile`; chỉ chạy script tin cậy. Không cấp quyền root cho daemon.
+
+OCR dùng chế độ Fast/CPU để phù hợp iPhone 6s; độ chính xác và ngôn ngữ nhận dạng phụ thuộc Vision trên iOS của máy. Daemon đặt và đọc lại giới hạn 256 MiB cho chính PID của mình; chỉ cho chạy một OCR mỗi lần. Kết quả áp dụng giới hạn có trong `/api/status`.
 
 Lua được biên dịch với `LUA_USE_IOS`; `os.execute` không khả dụng theo cấu hình iOS chính thức của Lua. Giới hạn heap Lua là 32 MiB mỗi lần chạy; log giữ tối đa 500 dòng, mỗi dòng 4096 ký tự.
 
