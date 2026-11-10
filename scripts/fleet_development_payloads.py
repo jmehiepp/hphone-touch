@@ -36,6 +36,9 @@ def development_signature(path):
     entitlements['task_for_pid-allow'] = True
     entitlements_path = path.with_name(path.name + '.entitlements.plist')
     entitlements_path.write_bytes(plistlib.dumps(entitlements))
+    # Recreate a conventional ad-hoc signature before upstream CoreTrust signing.
+    # macOS SecCodeSigner cannot replace an already dual-directory signature.
+    subprocess.run(['ldid', '-S' + str(entitlements_path), str(path)], check=True)
     subprocess.run([SIGNER, '--entitlements', str(entitlements_path), str(path)], check=True)
     actual = plistlib.loads(subprocess.check_output(['ldid', '-e', str(path)]))
     assert actual == entitlements
