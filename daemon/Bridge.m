@@ -2,8 +2,7 @@
 #import "IOSurfaceCompat.h"
 #import <Vision/Vision.h>
 #import <ImageIO/ImageIO.h>
-#import <CoreImage/CoreImage.h>
-#import <Metal/Metal.h>
+#import <CoreVideo/CoreVideo.h>
 #import <dlfcn.h>
 #import <mach/mach_time.h>
 #import <unistd.h>
@@ -101,7 +100,7 @@ NSDictionary *HPCapabilities(void) {
     NSDictionary *diagnostics;setup();@synchronized(captureLock){diagnostics=screenDiagnostics?:@{@"stage":@"notTried"};}
     setup(); return @{@"lua":@YES,@"scripts":@YES,@"screenBridgePresent":@(mainDisplay&&surfaceForLayer),
         @"touchBridgePresent":@(client&&digitizer&&finger&&appendEvent&&dispatchEvent),@"keyBridgePresent":@(client&&keyboard&&dispatchEvent),
-        @"screenLastCheck":diagnostics,@"ocrMode":@"fast-cpu-metal-preprocess",@"deviceValidation":@"required",@"version":@"0.1.9"};
+        @"screenLastCheck":diagnostics,@"ocrMode":@"fast-cpu-pixelbuffer",@"deviceValidation":@"required",@"version":@"0.1.10"};
 }
 NSData *HPScreenshot(void) {
     CGImageRef image=capture(); if(!image) return nil;
@@ -113,16 +112,26 @@ NSArray *HPOCR(void) {
     setup();if(![ocrLock tryLock])return nil;
     @try {
     traceStage("OCR capture\n");
-    NSData *png=HPScreenshot(); if(!png)return nil;
+    CGImageRef image=capture();if(!image)return nil;
+    size_t width=CGImageGetWidth(image),height=CGImageGetHeight(image),sourceRow=CGImageGetBytesPerRow(image);
+    CFDataRef source=CGDataProviderCopyData(CGImageGetDataProvider(image));CGImageRelease(image);
+    if(!source||CFDataGetLength(source)<sourceRow*height){if(source)CFRelease(source);return nil;}
+    CVPixelBufferRef pixels=NULL;
+    CVReturn created=CVPixelBufferCreate(kCFAllocatorDefault,width,height,kCVPixelFormatType_32BGRA,NULL,&pixels);
+    if(created||!pixels){CFRelease(source);return nil;}
+    if(CVPixelBufferLockBaseAddress(pixels,0)){CVPixelBufferRelease(pixels);CFRelease(source);return nil;}
+    unsigned char *destination=CVPixelBufferGetBaseAddress(pixels);size_t destinationRow=CVPixelBufferGetBytesPerRow(pixels);
+    if(!destination||destinationRow<width*4){CVPixelBufferUnlockBaseAddress(pixels,0);CVPixelBufferRelease(pixels);CFRelease(source);return nil;}
+    const unsigned char *bytes=CFDataGetBytePtr(source);
+    for(size_t y=0;y<height;y++)memcpy(destination+y*destinationRow,bytes+y*sourceRow,width*4);
+    CVPixelBufferUnlockBaseAddress(pixels,0);CFRelease(source);
     traceStage("OCR request init\n");
     VNRecognizeTextRequest *request=[VNRecognizeTextRequest new]; request.recognitionLevel=VNRequestTextRecognitionLevelFast;
     request.usesCPUOnly=YES;
     traceStage("OCR handler init\n");
-    id<MTLDevice> device=MTLCreateSystemDefaultDevice();if(!device)return nil;
-    CIContext *context=[CIContext contextWithMTLDevice:device options:@{kCIContextCacheIntermediates:@NO}];if(!context)return nil;
-    VNImageRequestHandler *handler=[[VNImageRequestHandler alloc] initWithData:png options:@{VNImageOptionCIContext:context}]; NSError *error=nil;
+    VNImageRequestHandler *handler=[[VNImageRequestHandler alloc] initWithCVPixelBuffer:pixels options:@{}]; NSError *error=nil;
     traceStage("OCR perform\n");
-    BOOL ok=[handler performRequests:@[request] error:&error];if(!ok)return nil;
+    BOOL ok=[handler performRequests:@[request] error:&error];CVPixelBufferRelease(pixels);if(!ok)return nil;
     traceStage("OCR results\n");
     NSMutableArray *items=[NSMutableArray array];
     for(VNRecognizedTextObservation *ob in request.results) {

@@ -8,7 +8,7 @@ hphone-touchd_FILES = daemon/main.m daemon/Bridge.m $(filter-out vendor/lua/src/
 hphone-touchd_CFLAGS = -Ivendor/lua/src -Idaemon -DLUA_USE_IOS -Wno-deprecated-declarations
 hphone-touchd_OBJCFLAGS = -fobjc-arc
 hphone-touchd_LDFLAGS = -lroothide -Wl,-sectcreate,__TEXT,__info_plist,daemon/Info.plist
-hphone-touchd_FRAMEWORKS = Foundation UIKit CoreGraphics IOSurface Vision ImageIO IOKit CoreImage Metal
+hphone-touchd_FRAMEWORKS = Foundation UIKit CoreGraphics IOSurface Vision ImageIO IOKit CoreVideo
 hphone-touchd_CODESIGN_FLAGS = -Sdaemon/entitlements.plist
 hphone-touchd_INSTALL_PATH = /usr/bin
 include $(THEOS_MAKE_PATH)/tool.mk
