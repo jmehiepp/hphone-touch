@@ -6,6 +6,10 @@
 #import <mach/mach_time.h>
 #import <unistd.h>
 #include <math.h>
+#include <execinfo.h>
+#include <signal.h>
+#include <fcntl.h>
+#include <string.h>
 typedef CFTypeRef HIDEvent;
 static void *io,*fb,*quartz;
 static void *client;
@@ -27,10 +31,18 @@ static HPIOMFBRef displayConnection;
 static NSObject *captureLock;
 static NSDictionary *screenDiagnostics;
 static NSLock *ocrLock;
+static int diagnosticFD=-1;
+static void crashTrace(int sig) {
+    if(diagnosticFD>=0){void *frames[48];int count=backtrace(frames,48);backtrace_symbols_fd(frames,count,diagnosticFD);fsync(diagnosticFD);}
+    signal(sig,SIG_DFL);raise(sig);
+}
+static void traceStage(const char *stage){if(diagnosticFD>=0)write(diagnosticFD,stage,strlen(stage));}
 static void setup(void) {
     static dispatch_once_t once; dispatch_once(&once,^{
         captureLock=[NSObject new];
         ocrLock=[NSLock new];
+        diagnosticFD=open("/var/mobile/Library/HPhoneTouch/native-diagnostic.log",O_WRONLY|O_CREAT|O_APPEND|O_NOFOLLOW,0600);
+        if(diagnosticFD>=0){signal(SIGSEGV,crashTrace);signal(SIGABRT,crashTrace);}
         io=dlopen("/System/Library/Frameworks/IOKit.framework/IOKit",RTLD_LAZY);
         fb=dlopen("/System/Library/PrivateFrameworks/IOMobileFramebuffer.framework/IOMobileFramebuffer",RTLD_LAZY);
         quartz=dlopen("/System/Library/Frameworks/QuartzCore.framework/QuartzCore",RTLD_LAZY);
@@ -87,7 +99,7 @@ NSDictionary *HPCapabilities(void) {
     NSDictionary *diagnostics;setup();@synchronized(captureLock){diagnostics=screenDiagnostics?:@{@"stage":@"notTried"};}
     setup(); return @{@"lua":@YES,@"scripts":@YES,@"screenBridgePresent":@(mainDisplay&&surfaceForLayer),
         @"touchBridgePresent":@(client&&digitizer&&finger&&appendEvent&&dispatchEvent),@"keyBridgePresent":@(client&&keyboard&&dispatchEvent),
-        @"screenLastCheck":diagnostics,@"ocrMode":@"fast-cpu",@"deviceValidation":@"required",@"version":@"0.1.6"};
+        @"screenLastCheck":diagnostics,@"ocrMode":@"fast-cpu",@"deviceValidation":@"required",@"version":@"0.1.7"};
 }
 NSData *HPScreenshot(void) {
     CGImageRef image=capture(); if(!image) return nil;
@@ -98,11 +110,16 @@ NSData *HPScreenshot(void) {
 NSArray *HPOCR(void) {
     setup();if(![ocrLock tryLock])return nil;
     @try {
+    traceStage("OCR capture\n");
     CGImageRef image=capture(); if(!image) return nil;
+    traceStage("OCR request init\n");
     VNRecognizeTextRequest *request=[VNRecognizeTextRequest new]; request.recognitionLevel=VNRequestTextRecognitionLevelFast;
     request.usesCPUOnly=YES;
+    traceStage("OCR handler init\n");
     VNImageRequestHandler *handler=[[VNImageRequestHandler alloc] initWithCGImage:image options:@{}]; NSError *error=nil;
+    traceStage("OCR perform\n");
     BOOL ok=[handler performRequests:@[request] error:&error]; CGImageRelease(image); if(!ok)return nil;
+    traceStage("OCR results\n");
     NSMutableArray *items=[NSMutableArray array];
     for(VNRecognizedTextObservation *ob in request.results) {
         VNRecognizedText *text=[[ob topCandidates:1] firstObject]; if(text) [items addObject:@{@"text":text.string,@"confidence":@(text.confidence),@"x":@(ob.boundingBox.origin.x),@"y":@(ob.boundingBox.origin.y),@"w":@(ob.boundingBox.size.width),@"h":@(ob.boundingBox.size.height)}];

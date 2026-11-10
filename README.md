@@ -1,6 +1,6 @@
 # HPhone Touch
 
-Công cụ tự động hóa Lua độc lập cho iPhone dùng Dopamine RootHide. Mục tiêu đầu tiên: iPhone 6s (ARM64), iOS 15.x. **0.1.6 là bản thử nghiệm, đang kiểm tra trên thiết bị. Không tuyên bố tương đương đầy đủ HBTouch.**
+Công cụ tự động hóa Lua độc lập cho iPhone dùng Dopamine RootHide. Mục tiêu đầu tiên: iPhone 6s (ARM64), iOS 15.x. **0.1.7 là bản thử nghiệm, đang kiểm tra trên thiết bị. Không tuyên bố tương đương đầy đủ HBTouch.**
 
 Kho Sileo dự kiến: `https://jmehiepp.github.io/hphone-touch/`. Chỉ có gói sau khi GitHub Actions build và kiểm tra thành công. Đây là kho APT riêng, Sileo là ứng dụng đọc kho. Release hiện chưa ký GPG.
 
