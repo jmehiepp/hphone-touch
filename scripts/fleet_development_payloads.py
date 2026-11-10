@@ -22,7 +22,7 @@ SOURCES = {
         'https://github.com/opa334/TrollStore/releases/download/2.1.1/PersistenceHelper_Embedded',
         'f0915cb7a608522ef84a43c6617433037e030ff68f5db89a6bb982f8430a0cb9'),
     'Dopamine-roothide-3.0.13-30.ipa': (
-        'https://github.com/roothide/Dopamine2-roothide/releases/download/3.0.13-30/Dopamine.tipa',
+        'https://github.com/roothide/Dopamine-roothide/releases/download/30/Dopamine-roothide-3.0.13-30.tipa',
         '98bc39c88161da1671eda56bd4139c85507b9089a8fdae80b333e975b88438f9'),
 }
 
