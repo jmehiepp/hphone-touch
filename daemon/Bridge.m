@@ -3,6 +3,7 @@
 #import <Vision/Vision.h>
 #import <ImageIO/ImageIO.h>
 #import <CoreImage/CoreImage.h>
+#import <Metal/Metal.h>
 #import <dlfcn.h>
 #import <mach/mach_time.h>
 #import <unistd.h>
@@ -100,7 +101,7 @@ NSDictionary *HPCapabilities(void) {
     NSDictionary *diagnostics;setup();@synchronized(captureLock){diagnostics=screenDiagnostics?:@{@"stage":@"notTried"};}
     setup(); return @{@"lua":@YES,@"scripts":@YES,@"screenBridgePresent":@(mainDisplay&&surfaceForLayer),
         @"touchBridgePresent":@(client&&digitizer&&finger&&appendEvent&&dispatchEvent),@"keyBridgePresent":@(client&&keyboard&&dispatchEvent),
-        @"screenLastCheck":diagnostics,@"ocrMode":@"fast-cpu",@"deviceValidation":@"required",@"version":@"0.1.8"};
+        @"screenLastCheck":diagnostics,@"ocrMode":@"fast-cpu-metal-preprocess",@"deviceValidation":@"required",@"version":@"0.1.9"};
 }
 NSData *HPScreenshot(void) {
     CGImageRef image=capture(); if(!image) return nil;
@@ -117,7 +118,8 @@ NSArray *HPOCR(void) {
     VNRecognizeTextRequest *request=[VNRecognizeTextRequest new]; request.recognitionLevel=VNRequestTextRecognitionLevelFast;
     request.usesCPUOnly=YES;
     traceStage("OCR handler init\n");
-    CIContext *context=[CIContext contextWithOptions:@{kCIContextUseSoftwareRenderer:@YES}];
+    id<MTLDevice> device=MTLCreateSystemDefaultDevice();if(!device)return nil;
+    CIContext *context=[CIContext contextWithMTLDevice:device options:@{kCIContextCacheIntermediates:@NO}];if(!context)return nil;
     VNImageRequestHandler *handler=[[VNImageRequestHandler alloc] initWithData:png options:@{VNImageOptionCIContext:context}]; NSError *error=nil;
     traceStage("OCR perform\n");
     BOOL ok=[handler performRequests:@[request] error:&error];if(!ok)return nil;
