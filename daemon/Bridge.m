@@ -191,12 +191,12 @@ static BOOL keyCode(NSString *name,uint32_t *page,uint32_t *usage,BOOL *shift){
     code=special[name.uppercaseString];if(code){*usage=code.unsignedIntValue;return YES;}
     if(name.length!=1)return NO;unichar c=[name characterAtIndex:0];
     if(c>='A'&&c<='Z'){*usage=4+c-'A';*shift=YES;return YES;}if(c>='a'&&c<='z'){*usage=4+c-'a';return YES;}
-    if(c>='1'&&c<='9'){*usage=0x1e+c-'1';return YES;}if(c=='0'){*usage=0x27;return YES;}
+    if(c>='1'&&c<='9'){*usage=0x1e + c-'1';return YES;}if(c=='0'){*usage=0x27;return YES;}
     NSString *normal=@"\n\b\t -=[]\\;'`,./",*shifted=@"\n\b\t _+{}|:\"~<>?";
     const uint32_t usages[]={0x28,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f,0x30,0x31,0x33,0x34,0x35,0x36,0x37,0x38};
     NSRange r=[normal rangeOfString:name];if(r.location!=NSNotFound){*usage=usages[r.location];return YES;}
     r=[shifted rangeOfString:name];if(r.location!=NSNotFound){*usage=usages[r.location];*shift=YES;return YES;}
-    r=[@"!@#$%^&*()" rangeOfString:name];if(r.location!=NSNotFound){*usage=r.location==9?0x27:(uint32_t)(0x1e+r.location);*shift=YES;return YES;}return NO;
+    r=[@"!@#$%^&*()" rangeOfString:name];if(r.location!=NSNotFound){*usage=r.location==9?0x27:(uint32_t)(0x1e + r.location);*shift=YES;return YES;}return NO;
 }
 static BOOL otherShiftHeld(NSString *excluded){for(NSString *key in heldKeys){if([key isEqual:excluded])continue;NSDictionary *p=heldKeys[key];if([p[@"shift"] boolValue]||([p[@"page"] unsignedIntValue]==7&&[p[@"usage"] unsignedIntValue]==0xe1))return YES;}return NO;}
 static BOOL releaseHeldKey(NSString *key){NSDictionary *held=heldKeys[key];if(!held)return NO;uint32_t page=[held[@"page"] unsignedIntValue],usage=[held[@"usage"] unsignedIntValue];BOOL sharedShift=otherShiftHeld(key);BOOL ok=page==7&&usage==0xe1&&sharedShift?YES:sendKey(page,usage,NO);[heldKeys removeObjectForKey:key];if([held[@"shift"] boolValue]&&!sharedShift)ok=sendKey(7,0xe1,NO)&&ok;return ok;}

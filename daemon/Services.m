@@ -179,7 +179,7 @@ static NSArray *inventory(NSString *root,BOOL source,NSError **error) {
         if(source&&([relative hasPrefix:@".hphone-"]||[relative hasPrefix:@".com.apple.mobile_container_manager.metadata.plist"])){[walk skipDescendants];continue;}
         if(!relativeSafe(relative)){if(error)*error=[NSError errorWithDomain:@"HPhoneServices" code:1 userInfo:@{NSLocalizedDescriptionKey:@"Invalid relative path"}];return nil;}
         NSString *path=[root stringByAppendingPathComponent:relative];struct stat st;
-        if(lstat(path.fileSystemRepresentation,&st)||(!S_ISREG(st.st_mode)&&!S_ISDIR(st.st_mode))||st.st_nlink>1&&!S_ISDIR(st.st_mode)){
+        if(lstat(path.fileSystemRepresentation,&st)||(!S_ISREG(st.st_mode)&&!S_ISDIR(st.st_mode))||(st.st_nlink>1&&!S_ISDIR(st.st_mode))){
             if(error)*error=[NSError errorWithDomain:@"HPhoneServices" code:2 userInfo:@{NSLocalizedDescriptionKey:[@"Unsupported or unreadable entry: " stringByAppendingString:relative]}];return nil;
         }
         total+=S_ISREG(st.st_mode)?st.st_size:0;
@@ -192,7 +192,6 @@ static NSArray *inventory(NSString *root,BOOL source,NSError **error) {
     return [result sortedArrayUsingComparator:^NSComparisonResult(NSDictionary *a,NSDictionary *b){return [a[@"path"] compare:b[@"path"]];}];
 }
 static BOOL copyEntries(NSString *source,NSString *destination,NSArray *entries,NSError **error) {
-    NSFileManager *fm=NSFileManager.defaultManager;
     for(NSDictionary *row in entries){NSString *relative=row[@"path"],*from=[source stringByAppendingPathComponent:relative],*to=[destination stringByAppendingPathComponent:relative];
         if(!relativeSafe(relative)||!within(to,destination))return NO;
         if([row[@"directory"] boolValue]){if(!ensureDirectory(to,error))return NO;}
