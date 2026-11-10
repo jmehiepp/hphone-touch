@@ -7,7 +7,7 @@
 #import <unistd.h>
 #include <math.h>
 typedef CFTypeRef HIDEvent;
-static void *io,*fb;
+static void *io,*fb,*quartz;
 static void *client;
 static void *(*createClient)(CFAllocatorRef);
 static void (*dispatchEvent)(void *,HIDEvent);
@@ -20,6 +20,8 @@ static void (*setInt)(HIDEvent,uint32_t,int64_t);
 typedef struct __IOMobileFramebuffer *HPIOMFBRef;
 static int (*mainDisplay)(HPIOMFBRef *);
 static int (*surfaceForLayer)(HPIOMFBRef,int,IOSurfaceRef *);
+static void (*displaySize)(HPIOMFBRef,CGSize *);
+static void (*renderDisplay)(int,CFStringRef,IOSurfaceRef,int,int);
 static HPIOMFBRef displayConnection;
 static NSObject *captureLock;
 static NSDictionary *screenDiagnostics;
@@ -28,6 +30,8 @@ static void setup(void) {
         captureLock=[NSObject new];
         io=dlopen("/System/Library/Frameworks/IOKit.framework/IOKit",RTLD_LAZY);
         fb=dlopen("/System/Library/PrivateFrameworks/IOMobileFramebuffer.framework/IOMobileFramebuffer",RTLD_LAZY);
+        quartz=dlopen("/System/Library/Frameworks/QuartzCore.framework/QuartzCore",RTLD_LAZY);
+        if(quartz)renderDisplay=dlsym(quartz,"CARenderServerRenderDisplay");
         if(io) {
             createClient=dlsym(io,"IOHIDEventSystemClientCreate"); dispatchEvent=dlsym(io,"IOHIDEventSystemClientDispatchEvent");
             digitizer=dlsym(io,"IOHIDEventCreateDigitizerEvent"); finger=dlsym(io,"IOHIDEventCreateDigitizerFingerEvent");
@@ -35,7 +39,7 @@ static void setup(void) {
             setInt=dlsym(io,"IOHIDEventSetIntegerValue");
             if(createClient) client=createClient(kCFAllocatorDefault);
         }
-        if(fb) { mainDisplay=dlsym(fb,"IOMobileFramebufferGetMainDisplay"); surfaceForLayer=dlsym(fb,"IOMobileFramebufferGetLayerDefaultSurface"); }
+        if(fb) { mainDisplay=dlsym(fb,"IOMobileFramebufferGetMainDisplay"); surfaceForLayer=dlsym(fb,"IOMobileFramebufferGetLayerDefaultSurface"); displaySize=dlsym(fb,"IOMobileFramebufferGetDisplaySize"); }
     });
 }
 static CGImageRef capture(void) {
@@ -44,9 +48,24 @@ static CGImageRef capture(void) {
     if(!displayConnection){int code=mainDisplay(&displayConnection);if(code||!displayConnection){screenDiagnostics=@{@"stage":@"mainDisplay",@"code":@(code)};return NULL;}}
     IOSurfaceRef s=NULL;
     int code=surfaceForLayer(displayConnection,0,&s);
-    if(code||!s){screenDiagnostics=@{@"stage":@"displaySurface",@"code":@(code),@"hasSurface":@(s!=NULL)};return NULL;}
+    BOOL owned=NO;NSString *method=@"framebuffer";
+    if(code||!s){
+        // iOS may deny direct framebuffer reads to mobile. Render into an owned surface.
+        CGSize size=CGSizeZero;if(displaySize)displaySize(displayConnection,&size);
+        if(!renderDisplay||!isfinite(size.width)||!isfinite(size.height)||size.width<1||size.height<1||size.width>8192||size.height>8192){screenDiagnostics=@{@"stage":@"displaySurface",@"code":@(code),@"width":@(size.width),@"height":@(size.height)};return NULL;}
+        size_t width=(size_t)size.width,height=(size_t)size.height,row=(width*4+63)&~(size_t)63;
+        if(row*height>128*1024*1024)return NULL;
+        NSDictionary *properties=@{(__bridge NSString *)kIOSurfaceWidth:@(width),(__bridge NSString *)kIOSurfaceHeight:@(height),(__bridge NSString *)kIOSurfaceBytesPerRow:@(row),(__bridge NSString *)kIOSurfaceBytesPerElement:@4,(__bridge NSString *)kIOSurfaceAllocSize:@(row*height),(__bridge NSString *)kIOSurfacePixelFormat:@(0x42475241)};
+        s=IOSurfaceCreate((__bridge CFDictionaryRef)properties);
+        if(!s){screenDiagnostics=@{@"stage":@"createRenderSurface"};return NULL;}
+        owned=YES;method=@"renderServer";
+        int lockResult=IOSurfaceLock(s,0,NULL);
+        if(lockResult){CFRelease(s);screenDiagnostics=@{@"stage":@"lockRenderSurface",@"code":@(lockResult)};return NULL;}
+        renderDisplay(0,CFSTR("LCD"),s,0,0);
+        IOSurfaceUnlock(s,0,NULL);
+    }
     code=IOSurfaceLock(s,kIOSurfaceLockReadOnly,NULL);
-    if(code){screenDiagnostics=@{@"stage":@"lockSurface",@"code":@(code)};return NULL;}
+    if(code){if(owned)CFRelease(s);screenDiagnostics=@{@"stage":@"lockSurface",@"code":@(code)};return NULL;}
     size_t w=IOSurfaceGetWidth(s),h=IOSurfaceGetHeight(s),row=IOSurfaceGetBytesPerRow(s);
     CGImageRef image=NULL;
     if(w&&h&&w<16384&&h<16384&&row>=w*4&&row<128*1024*1024/h&&IOSurfaceGetBaseAddress(s)) {
@@ -56,15 +75,15 @@ static CGImageRef capture(void) {
         image=CGImageCreate(w,h,8,32,row,color,kCGBitmapByteOrder32Little|kCGImageAlphaPremultipliedFirst,provider,NULL,false,kCGRenderingIntentDefault);
         CGColorSpaceRelease(color); CGDataProviderRelease(provider); CFRelease(bytes);
     }
-    screenDiagnostics=@{@"stage":image?@"ok":@"pixelFormat",@"width":@(w),@"height":@(h),@"row":@(row)};
-    IOSurfaceUnlock(s,kIOSurfaceLockReadOnly,NULL); return image;
+    screenDiagnostics=@{@"stage":image?@"ok":@"pixelFormat",@"method":method,@"width":@(w),@"height":@(h),@"row":@(row)};
+    IOSurfaceUnlock(s,kIOSurfaceLockReadOnly,NULL);if(owned)CFRelease(s);return image;
     }
 }
 NSDictionary *HPCapabilities(void) {
     NSDictionary *diagnostics;setup();@synchronized(captureLock){diagnostics=screenDiagnostics?:@{@"stage":@"notTried"};}
     setup(); return @{@"lua":@YES,@"scripts":@YES,@"screenBridgePresent":@(mainDisplay&&surfaceForLayer),
         @"touchBridgePresent":@(client&&digitizer&&finger&&appendEvent&&dispatchEvent),@"keyBridgePresent":@(client&&keyboard&&dispatchEvent),
-        @"screenLastCheck":diagnostics,@"deviceValidation":@"required",@"version":@"0.1.2"};
+        @"screenLastCheck":diagnostics,@"deviceValidation":@"required",@"version":@"0.1.3"};
 }
 NSData *HPScreenshot(void) {
     CGImageRef image=capture(); if(!image) return nil;
