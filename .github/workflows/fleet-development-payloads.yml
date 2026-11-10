@@ -1,0 +1,28 @@
+name: Build inspectable fleet development payloads
+on:
+  push:
+    branches: [fleet-automation-helper]
+    paths:
+      - .github/workflows/fleet-development-payloads.yml
+      - scripts/fleet_development_payloads.py
+permissions:
+  contents: read
+jobs:
+  sign:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install pkg-config openssl@3 ldid
+      - name: Build upstream signing tool
+        run: |
+          git clone --branch 2.1.1 --depth 1 --recurse-submodules https://github.com/opa334/TrollStore.git "$RUNNER_TEMP/TrollStore"
+          git -C "$RUNNER_TEMP/TrollStore" rev-parse HEAD
+          export PKG_CONFIG_PATH="$(brew --prefix openssl@3)/lib/pkgconfig"
+          make -C "$RUNNER_TEMP/TrollStore/Exploits/fastPathSign"
+      - name: Prepare development signatures for USB UI automation
+        run: python3 scripts/fleet_development_payloads.py "$RUNNER_TEMP/TrollStore/Exploits/fastPathSign/fastPathSign"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fleet-development-payloads
+          path: fleet-development-output/*
+          if-no-files-found: error
