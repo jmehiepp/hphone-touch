@@ -34,6 +34,7 @@ static int millisLua(lua_State *L){struct timespec ts;clock_gettime(CLOCK_MONOTO
 static int clearLua(lua_State *L){HPClearLog();return 0;}
 static int rawScreenshot(lua_State *L){@autoreleasepool{NSData *data=HPScreenshot();if(data){lua_pushlstring(L,data.bytes,data.length);return 1;}}return luaL_error(L,"Screen capture unavailable");}
 static int contextGC(lua_State *L){void **ptr=lua_touserdata(L,1);if(ptr&&*ptr){CFRelease(*ptr);*ptr=NULL;}return 0;}
+static int foldLua(lua_State *L){NSString *source=stringArg(L,1);@autoreleasepool{NSString *folded=[[source stringByFoldingWithOptions:NSDiacriticInsensitiveSearch|NSCaseInsensitiveSearch locale:[NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"]] stringByReplacingOccurrencesOfString:@"đ" withString:@"d"];NSData *data=[folded dataUsingEncoding:NSUTF8StringEncoding];lua_pushlstring(L,data.bytes,data.length);}return 1;}
 static void stopHook(lua_State *L,lua_Debug *ar){lua_getfield(L,LUA_REGISTRYINDEX,"hphone.context");HPLuaContext *c=(__bridge HPLuaContext *)lua_touserdata(L,-1);lua_pop(L,1);if(c.cancel())luaL_error(L,"Stopped by user");}
 void HPRegisterLua(lua_State *L,NSString *name,NSString *identifier,BOOL(^cancel)(void)){
     HPLuaContext *c=[HPLuaContext new];c.name=name;c.identifier=identifier;c.cancel=cancel;
@@ -41,6 +42,6 @@ void HPRegisterLua(lua_State *L,NSString *name,NSString *identifier,BOOL(^cancel
     void **sentinel=lua_newuserdatauv(L,sizeof(void *),0);*sentinel=(__bridge_retained void *)c;
     if(luaL_newmetatable(L,"hphone.context-owner")){lua_pushcfunction(L,contextGC);lua_setfield(L,-2,"__gc");}lua_setmetatable(L,-2);lua_setfield(L,LUA_REGISTRYINDEX,"hphone.sentinel");
     lua_pushlightuserdata(L,(__bridge void *)c);lua_setfield(L,LUA_REGISTRYINDEX,"hphone.context");
-    const struct{const char *name;lua_CFunction fn;} funcs[]={{"_hp",native},{"print",printLua},{"log",printLua},{"sleep",sleepLua},{"_json",jsonLua},{"_b64",base64Lua},{"millis",millisLua},{"clearLog",clearLua},{"screenshotBytes",rawScreenshot}};
+    const struct{const char *name;lua_CFunction fn;} funcs[]={{"_hp",native},{"print",printLua},{"log",printLua},{"sleep",sleepLua},{"_json",jsonLua},{"_b64",base64Lua},{"millis",millisLua},{"clearLog",clearLua},{"screenshotBytes",rawScreenshot},{"_fold",foldLua}};
     for(size_t i=0;i<sizeof(funcs)/sizeof(funcs[0]);i++){lua_pushlightuserdata(L,(__bridge void *)c);lua_pushcclosure(L,funcs[i].fn,1);lua_setglobal(L,funcs[i].name);}HPPushObject(L,name);lua_setglobal(L,"_HP_NAME");HPPushObject(L,HPScriptsRoot());lua_setglobal(L,"_HP_ROOT");HPPushObject(L,identifier);lua_setglobal(L,"_HP_ID");lua_sethook(L,stopHook,LUA_MASKCOUNT,1000);
 }

@@ -23,15 +23,23 @@ exit=stop
 function rootDir() return _HP_ROOT end
 function botPath() return _HP_ROOT..'/'.._HP_NAME end
 function currentDir() return botPath():match('^(.*)/') end
-local function relative(path)
+local function relative(path,readExisting)
   path=path or ''
   if path:sub(1,1)=='/' then return path end
   local dir=_HP_NAME:match('^(.*)/')
-  return dir and (dir..'/'..path) or path
+  if dir then
+    local localPath=dir..'/'..path
+    if readExisting then
+      local current=native('fs','exists',{action='exists',path=localPath})
+      if not current.exists then local shared=native('fs','exists',{action='exists',path=path});if shared.exists then return path end end
+    end
+    return localPath
+  end
+  return path
 end
 package.path=currentDir()..'/?.lua;'..rootDir()..'/?.lua;'..rootDir()..'/?/init.lua'
 local function file(action,path,value)
-  local args={action=action,path=relative(path)}
+  local args={action=action,path=relative(path,action~='write' and action~='append')}
   if value~=nil then args.base64=base64Encode(value) end
   local r=native('fs',action,args)
   if not r.ok then return nil,r.error end
@@ -65,7 +73,7 @@ table.toString=table.tostring
 KEY_TYPE={HOME_BUTTON='home',POWER_BUTTON='power',VOLUME_UP_BUTTON='volumeUp',VOLUME_DOWN_BUTTON='volumeDown'}
 CONTROLLER_TYPE={LABEL='LABEL',INPUT='INPUT',TEXTVIEW='TEXTVIEW',PICKER='PICKER',SWITCH='SWITCH',BUTTON='BUTTON',REMEMBER='REMEMBER'}
 ORIENTATION_TYPE={UNKNOWN=0,PORTRAIT=1,PORTRAIT_UPSIDE_DOWN=2,LANDSCAPE_LEFT=3,LANDSCAPE_RIGHT=4}
-function getVersion() return '0.2.0' end
+function getVersion() return '0.2.1' end
 function getOrientation() return ORIENTATION_TYPE.PORTRAIT end
 function tap(x,y,count,interval) return input('tap',{x=x,y=y,count=count,interval_us=interval}).dispatched end
 function doubleTap(x,y,gap) return input('doubleTap',{x=x,y=y,gap_ms=gap}).dispatched end
@@ -127,7 +135,7 @@ function screenshot(path,region)
 end
 function findImage(options)
   if type(options)=='string' then options={image=options} end
-  local a={};for k,v in pairs(options) do a[k]=v end;a.image=relative(a.image)
+  local a={};for k,v in pairs(options) do a[k]=v end;a.image=relative(a.image,true)
   return visual('findImage',a).matches
 end
 function findImageTap(image,count,threshold,region,ox,oy)
@@ -170,7 +178,7 @@ function ocr(options)
 end
 function getText(options) local text={};for _,p in ipairs(ocr(options)) do text[#text+1]=p.text end;return table.concat(text,'\n') end
 function findText(text,options,exact)
-  local out={};text=text:lower();for _,p in ipairs(ocr(options)) do local t=p.text:lower();if (exact and t==text) or (not exact and t:find(text,1,true)) then out[#out+1]=p end end;return out
+  local out={};text=_fold(text);for _,p in ipairs(ocr(options)) do local t=_fold(p.text);if (exact and t==text) or (not exact and t:find(text,1,true)) then out[#out+1]=p end end;return out
 end
 function waitText(text,options,timeout,interval,exact) return waitFor(function() return findText(text,options,exact)[1] end,timeout,interval or .5) end
 function tapText(text,options,timeout,interval,exact) local p=waitText(text,options,timeout or 0,interval,exact);if p then tap(p.centerX,p.centerY);return p.centerX,p.centerY end end
@@ -191,7 +199,7 @@ function restoreApp(bundle,name) local value,r=service('restoreApp',{bundleId=bu
 function wipeApp(bundle) local value,r=service('wipeApp',{bundleId=bundle,confirmBundle=bundle});if not value then return {ok=false,error=r} end;value.recoveryBackup=r.recoveryBackup;return value end
 function deleteBackup(bundle,name) local value,e=service('deleteBackup',{bundleId=bundle,name=name});return {ok=value==true,error=e and type(e)=='string' and e or nil} end
 function listBackups(bundle) return service('listBackups',{bundleId=bundle}) end
-function runScript(path) local r=native('jobs','run',{name=relative(path)});return r.id,r.error end
+function runScript(path) local r=native('jobs','run',{name=relative(path,true)});return r.id,r.error end
 function stopScript(id) return call('jobs','stop',{id=id}).count end
 function stopAllScripts() call('jobs','stop');stop() end
 function runningScripts() return call('jobs','list').jobs end
@@ -215,13 +223,14 @@ end
 function httpGet(url,opts) return http('GET',url,nil,opts) end
 function httpPost(url,body,opts) return http('POST',url,body,opts) end
 function httpRequest(opts) return http(opts.method or 'GET',opts.url,nil,opts) end
-for _,op in ipairs({'getCookies','getCookieHeader','getCookiesText','getCookiesJSON','getSafariCookies'}) do _G[op]=function(opts) if type(opts)=='string' then opts={domain=opts} end;return service(op,opts or {}) end end
+for _,op in ipairs({'getCookies','getCookieHeader','getCookiesText','getCookiesJSON'}) do _G[op]=function(opts) if type(opts)=='string' then opts={domain=opts} end;return service(op,opts or {}) end end
+getSafariCookies=getCookies
 function safariCookiesPath() return service('safariCookiesPath') end
-function importCookies(cookies,opts) opts=opts or {};opts.cookies=cookies;return service('importCookies',opts) end
+function importCookies(cookies,opts) opts=opts or {};opts.cookies=cookies;opts.domain=opts.domain or '*';opts.confirmDomain=opts.domain;return service('importCookies',opts) end
 setCookies=importCookies
-function deleteCookies(domain,opts) opts=opts or {};opts.domain=domain;return service('deleteCookies',opts) end
+function deleteCookies(domain,opts) opts=opts or {};opts.domain=domain or '*';opts.confirmDomain=opts.domain;return service('deleteCookies',opts) end
 clearCookies=deleteCookies
-function restoreCookies(path) return service('restoreCookies',{file=path}) end
+function restoreCookies(path,opts) opts=opts or {};opts.file=path;opts.domain=opts.domain or '*';opts.confirmDomain=opts.domain;return service('restoreCookies',opts) end
 for _,op in ipairs({'airplaneMode','wifi','cellularData'}) do _G[op]=function(on) return service(op,{enabled=on}) end end
 wifiEnabled=wifi;setWifi=wifi;setCellularData=cellularData
 function getRadios() local a=airplaneMode();local w=wifi();local c=cellularData();return a,w,c end

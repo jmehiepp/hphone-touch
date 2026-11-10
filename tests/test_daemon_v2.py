@@ -210,6 +210,18 @@ print('json-depth-guard-ok')
         self.until(lambda: not self.call("jobs")["jobs"])
         self.assert_script_ok(self.run_lua("print('new-job-after-stop')"), "new-job-after-stop")
 
+    def test_shared_root_fallback_unicode_folding_and_cookie_alias(self):
+        self.call('fs',{'action':'write','path':'shared.txt','content':'root fallback'})
+        identifier=self.run_lua("""
+assert(readFile('shared.txt')=='root fallback')
+assert(_fold('ĐIỆN thoại')=='dien thoai')
+assert(getSafariCookies==getCookies)
+assert(writeFile('empty-queue.txt',''))
+assert(removeFirstLine('empty-queue.txt')==nil)
+print('shared-and-fold-ok')
+""",name='sub/main.lua')
+        self.assert_script_ok(identifier,'shared-and-fold-ok')
+
     def test_timer_persists_restart_and_deleted_script_can_be_unscheduled(self):
         self.save("timer.lua", "print('persisted-timer-fired')")
         fire = time.time() + 3

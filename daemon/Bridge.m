@@ -116,7 +116,7 @@ NSDictionary *HPCapabilities(void) {
         @"screenLastCheck":diagnostics,@"ocrMode":@"fast-cpu-pixelbuffer",@"tesseractRuntimePresent":@(loadTesseract()),
         @"inputOperations":@[@"tap",@"doubleTap",@"longPress",@"touchDown",@"touchMove",@"touchUp",@"swipe",@"swipeHold",@"swipePath",@"pinch",@"keyPress",@"keyDown",@"keyUp",@"inputText",@"releaseAll"],
         @"visualOperations":@[@"resolution",@"keepScreen",@"getColor",@"getColors",@"findColor",@"findColors",@"matchColors",@"colorCount",@"findImage",@"screenshot"],
-        @"deviceValidation":@"required",@"version":@"0.2.0"};
+        @"deviceValidation":@"required",@"version":@"0.2.1"};
 }
 NSData *HPScreenshot(void) {
     CGImageRef image=capture(); if(!image) return nil;

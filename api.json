@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.2.1",
   "referenceCount": 169,
   "items": [
     {
@@ -399,7 +399,7 @@
       "group": "Màn hình / màu / ảnh",
       "signature": "findText",
       "status": "partial",
-      "description": "Case-insensitive matching; Unicode accent folding is not implemented.",
+      "description": "Unicode case/diacritic folding, including Vietnamese; depends on OCR engine quality.",
       "example": ""
     },
     {

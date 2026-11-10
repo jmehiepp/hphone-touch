@@ -1,6 +1,6 @@
 Package: io.github.jmehiepp.hphone-touch
 Name: HPhone Touch
-Version: 0.2.0
+Version: 0.2.1
 Architecture: iphoneos-arm64e
 Description: Lua automation, visual matching, scripts, owner-managed data tools and USB fleet control. Experimental.
 Maintainer: jmehiepp

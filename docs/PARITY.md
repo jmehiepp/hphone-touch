@@ -55,7 +55,7 @@ The status describes source coverage. Runtime and device evidence are separate i
 | `ocr` | implemented; hardware validation pending | Original implementation. Availability depends on this iOS build and native permissions. |
 | `setOcrEngine` | implemented; hardware validation pending | Original implementation. Availability depends on this iOS build and native permissions. |
 | `getText` | implemented; hardware validation pending | Original implementation. Availability depends on this iOS build and native permissions. |
-| `findText` | partial | Case-insensitive matching; Unicode accent folding is not implemented. |
+| `findText` | partial | Unicode case/diacritic folding, including Vietnamese; depends on OCR engine quality. |
 | `tapText` | implemented; hardware validation pending | Original implementation. Availability depends on this iOS build and native permissions. |
 | `waitText` | implemented; hardware validation pending | Original implementation. Availability depends on this iOS build and native permissions. |
 | `tapColors` | implemented; hardware validation pending | Original implementation. Availability depends on this iOS build and native permissions. |

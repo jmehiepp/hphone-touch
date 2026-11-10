@@ -25,7 +25,7 @@ PARTIAL = {
     'swipe':'Linear interpolation; original easing is not reproduced.',
     'screenshot':'Returns a saved path; screenshotBytes() preserves the earlier binary interface.',
     'findImage':'Bounded RGB SAD search, nonoverlapping raster-order results; not score sorted.',
-    'findText':'Case-insensitive matching; Unicode accent folding is not implemented.',
+    'findText':'Unicode case/diacritic folding, including Vietnamese; depends on OCR engine quality.',
     'dialog':'Foreground/optional overlay forms; some overlay control types use text fields.',
     'clearDialogValues':'Dialog values are not persisted in this version.',
     'setAutoLaunch':'Daemon startup and SpringBoard startup notification; reboot/respring behavior pending hardware test.',
@@ -59,7 +59,7 @@ def generate():
         elif name in PARTIAL: status='partial';description=PARTIAL[name]
         if name.startswith('★'):status='reference note';description='Use only accounts and data owned by the device operator.'
         items.append({**item,'signature':name,'status':status,'description':description,'example':EXAMPLES.get(name,'')})
-    (ROOT/'api.json').write_text(json.dumps({'version':'0.2.0','referenceCount':len(items),'items':items},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    (ROOT/'api.json').write_text(json.dumps({'version':'0.2.1','referenceCount':len(items),'items':items},ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     lines=['# HBTouch declaration comparison','','This inventory covers169 entries declared in the shipped reference documentation, including dashboard entries and constants. It is not169 verified native functions. Original implementation; no binary or dashboard code copied.','','The status describes source coverage. Runtime and device evidence are separate in DEVICE_TEST.md. Keychain, app groups, .hb encryption, live Safari cookies, GPS, Photos operations and complete safe-mode control are not provided.','','| Entry | Source coverage | Limitation |','| --- | --- | --- |']
     for item in items:lines.append(f"| `{item['name']}` | {item['status']} | {item['description']} |")
     (ROOT/'docs/PARITY.md').write_text('\n'.join(lines)+'\n',encoding='utf-8')

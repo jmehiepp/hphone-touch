@@ -88,6 +88,14 @@ def validate_deb(path):
     if metadata.get("Package") != PACKAGE or metadata.get("Architecture") != "iphoneos-arm64e":
         raise ValueError("Unexpected package identity / RootHide architecture")
     payload = tar_files(payload_blob)
+    if metadata.get('Version','').startswith('0.2.'):
+        overlay='Library/MobileSubstrate/DynamicLibraries/HPhoneOverlay'
+        for path in (overlay+'.dylib',overlay+'.plist','usr/share/hphone-touch/compat.lua','usr/share/hphone-touch/api.json','usr/share/hphone-touch/tessdata/eng.traineddata','usr/share/hphone-touch/tessdata/vie.traineddata','usr/share/hphone-touch/tessdata/LICENSE'):
+            if path not in payload:
+                raise ValueError(f'Missing automation payload: {path}')
+        verify_macho(payload[overlay+'.dylib'])
+        if plistlib.loads(payload[overlay+'.plist']) != {'Filter':{'Bundles':['com.apple.springboard']}}:
+            raise ValueError('Overlay must be scoped only to SpringBoard')
     required = ["usr/bin/hphone-touchd", "Applications/HPhoneTouch.app/HPhoneTouch",
                 "Applications/HPhoneTouch.app/Info.plist", "usr/share/hphone-touch/web/index.html",
                 "usr/share/hphone-touch/web/app.js", "usr/share/hphone-touch/web/style.css",
@@ -142,7 +150,7 @@ def generate(packages, dest):
             release.append(f" {hashlib.new(algorithm, blob).hexdigest()} {len(blob)} {name}")
     (dest/"Release").write_text("\n".join(release)+"\n", encoding="utf-8", newline="\n")
     (dest/".nojekyll").touch()
-    (dest/"index.html").write_text('''<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>HPhone Touch · Sileo</title><style>body{font:16px/1.7 system-ui;max-width:680px;margin:60px auto;padding:20px;color:#dae6fa;background:#101a2c}a{color:#91b9ff}code{overflow-wrap:anywhere}</style><h1>HPhone Touch</h1><p>Công cụ Lua độc lập cho iPhone RootHide. Bản 0.1 thử nghiệm; cần kiểm tra trên máy thử trước khi triển khai hàng loạt.</p><p>Trong Sileo → Sources → +, thêm:</p><code>https://jmehiepp.github.io/hphone-touch/</code><p><a href="sileo://source/https://jmehiepp.github.io/hphone-touch/">Thêm vào Sileo</a></p><p>iOS 15+ · RootHide · ARM64 (iPhone 6s). Kho công khai chưa ký Release; không dùng để phân phối bản sản xuất.</p><p><a href="https://github.com/jmehiepp/hphone-touch">Mã nguồn, hướng dẫn và giới hạn</a></p></html>''', encoding="utf-8")
+    (dest/"index.html").write_text('''<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>HPhone Touch · Sileo</title><style>body{font:16px/1.7 system-ui;max-width:680px;margin:60px auto;padding:20px;color:#dae6fa;background:#101a2c}a{color:#91b9ff}code{overflow-wrap:anywhere}</style><h1>HPhone Touch</h1><p>Công cụ Lua độc lập cho iPhone RootHide: cử chỉ, tìm màu/ảnh, OCR, script và điều phối USB. Bản thử nghiệm; xem phạm vi kiểm chứng trước khi triển khai nhiều máy.</p><p>Trong Sileo → Sources → +, thêm:</p><code>https://jmehiepp.github.io/hphone-touch/</code><p><a href="sileo://source/https://jmehiepp.github.io/hphone-touch/">Thêm vào Sileo</a></p><p>iOS 15+ · RootHide · ARM64 (iPhone 6s). Release chưa ký GPG.</p><p><a href="https://github.com/jmehiepp/hphone-touch">Mã nguồn, hướng dẫn và giới hạn</a></p></html>''', encoding="utf-8")
     print(f"Validated {len(entries)} package(s); APT repository generated: {dest}")
 
 if __name__ == "__main__":

@@ -141,5 +141,5 @@ int main(void){@autoreleasepool{
 #ifndef HP_HOST_TEST
     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),NULL,springboardStarted,CFSTR("com.apple.springboard.finishedstartup"),NULL,CFNotificationSuspensionBehaviorDeliverImmediately);
 #endif
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW,3*NSEC_PER_SEC),dispatch_get_global_queue(QOS_CLASS_UTILITY,0),^{runAuto();});HPLog(@"HPhone Touch 0.2.0 ready",nil);dispatch_main();return 0;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW,3*NSEC_PER_SEC),dispatch_get_global_queue(QOS_CLASS_UTILITY,0),^{runAuto();});HPLog(@"HPhone Touch 0.2.1 ready",nil);dispatch_main();return 0;
 }}
