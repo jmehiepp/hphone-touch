@@ -1,28 +1,30 @@
-# Kiểm tra HPhone Touch 0.1.10 trên thiết bị
+# Ki?m ch?ng thi?t b? ? 10/11/2026
 
-Ngày 10/11/2026. Máy thử: iPhone 6s (iPhone8,1), iOS 15.8.4, Dopamine RootHide 3.0.13-30. Chỉ xác nhận máy thử này; không suy ra mọi thiết bị đều tương thích.
+Thi?t b? th?: iPhone 6s (iPhone8,1), iOS 15.8.4, Dopamine RootHide 3.0.13-30. B?n hi?n c?i: HPhone Touch 0.2.1. Kh?ng ??a UDID, token, m?t kh?u, cookie hay ?nh c? nh?n v?o b?o c?o c?ng khai.
 
-| Ca kiểm | Kết quả thực tế |
-| --- | --- |
-| Kho Sileo | Client tải index thành công; APT thấy candidate đúng tên gói |
-| Cài gói | Tải HTTPS, kiểm SHA256, cài qua USB/dpkg; trạng thái install ok installed |
-| App/icon | Icon có trên Home; mở app hiện Sẵn sàng |
-| hello.lua từ thao tác chạm | API chạm nút Lưu & chạy; log đủ Step 1, 2, 3 và Finished |
-| Chạy/dừng Lua | Script mẫu chạy; vòng lặp vô hạn dừng được; daemon còn hoạt động |
-| Đọc/lưu/xóa script | Đã kiểm trên thiết bị; file thử được xóa sau kiểm tra |
-| Chụp màn hình | PNG 750×1334, nội dung và màu đối chiếu đúng màn hình thật |
-| Chạm | Đã xác nhận tác động vào nút chạy trong UI, có log thực thi tương ứng |
-| Home | Đã quan sát chuyển từ app về màn hình Home |
-| OCR | HTTP 200, 16 khối chữ từ UI app; có text, confidence và bounding box; PID daemon không đổi |
-| Bộ nhớ | API kernel trả thành công; đọc lại active/inactive limit đều 256 MiB cho chính PID daemon |
-| API thiếu token | HTTP 401 trên thiết bị |
-| Xung đột cổng | Cổng 8765 đang bận; daemon chọn cổng khác, app đọc cổng tự động |
-| Power/âm lượng | Chưa thử |
-| Reboot rồi jailbreak lại | Chưa thử |
-| Gỡ/cài lại | Chưa thử; nâng cấp 0.1.x giữ hello.lua và token |
-| Path traversal/symlink | Qua host test chạy daemon thật với bridge stub; chưa thử lại trên iPhone |
-| 35 máy/chạy dài hạn | Chưa thử |
+## ?? x?c minh
 
-CI có 9 kiểm tra (4 package/APT, 5 nhóm HTTP/Lua daemon). Host test dùng bridge stub, không thay thế kiểm phần cứng. Build/test/deploy: https://github.com/jmehiepp/hphone-touch/actions/runs/42780541408
+- G?i l?y t? HTTPS APT, ki?m SHA256 v? payload tr??c khi truy?n USB; SFTP ??c l?i v? b?m ??i chi?u. `dpkg` c?i 0.2.1 th?nh c?ng.
+- App/daemon/overlay build ARM64 ALL, iOS t?i thi?u15.0. Overlay ch? c? filter `com.apple.springboard` v? ?ang t?t; ch?a n?p ?? th?.
+- B?n 0.2.0 m? v? hi?n th? UI m?i tr?n 6s. Tr?ng th?i API c?a 0.2.1 tr? ??ng phi?n b?n, daemon ho?t ??ng v?i user mobile UID501.
+- Lua JSON/base64 nh? ph?n v? ??c/ghi/x?a t?p m?u trong d? li?u c?a HPhone Touch ??t tr?n 0.2.1.
+- Ch?y ??ng th?i4 script, d?ng ri?ng 1 c?n 3, r?i d?ng c?c script th? c?n l?i ??t. Kh?ng d?ng script c?a ?ng d?ng kh?c.
+- M? b? ?i?u khi?n PC c?ng khai ?? upload/ch?y script m?u qua USB th?t tr?n1 m?y. Kh?ng in ho?c l?u token/m?t kh?u.
+- B?n pixel c?a bridge m?u m?i kh?p PNG ? t?a ?? b?t ??i x?ng tr?n 0.2.0. Tr?n 0.2.1, crop 290?70, l?y m?u, t?m m?u trong v?ng v? t?m l?i ch?nh ?nh crop ??u ??t; snapshot ???c th? sau th?.
+- Vision/en v? Tesseract/vi tr? l?n l??t 2 v? 4 kh?i ch? trong v?ng header750?180, c? h?p pixel. PID daemon gi? nguy?n. ??y l? ki?m tra engine ho?t ??ng, kh?ng ph?i ??nh gi? ?? ch?nh x?c ti?ng Vi?t.
+- `listInstalledApps`, `deviceInfo`, `getRadios` v? `getProxy` ??c th?nh c?ng tr?n m?y. Kh?ng thay Wi-Fi, proxy ho?c ch? ?? m?y bay.
+- Touch bridge 0.2.0 ?? nh?n ??ng n?t Tin c?y, d?n t?i m?n h?nh nh?p m? kh?a. M? kh?a ph?i nh?p tr?c ti?p b?i ch? m?y; kh?ng th? nh?p ho?c ?o?n.
 
-OCR Fast phụ thuộc ngôn ngữ Vision trên iOS 15; không đảm bảo nhận đầy đủ dấu tiếng Việt hoặc chữ nhỏ. Ảnh, log, UDID, mật khẩu và token của máy thử giữ cục bộ, không đưa vào repo công khai.
+## C?n ch?
+
+- B??c Trust ?ang c?n ch? m?y nh?p m? tr?n iPhone; kh?ng th? vu?t, g? ch? ho?c m? app kh?c trong l?c ch?.
+- Swipe/path/hold/pinch/?a ?i?m, ph?m gi?, nh?p ASCII/Unicode v? c?c thao t?c app/audio/radio/proxy ch?a ???c ki?m ch?ng ??y ?? tr?n m?y th?t.
+- Overlay/dialog ngo?i app, t? ch?y sau respring/reboot, c?i/g? l?i v? ch?y l?u ch?a th?.
+- Backup/restore/wipe/keychain/cookie kh?ng ???c th? tr?n d? li?u c? nh?n. Backup hi?n ch? app data, kh?ng c? keychain/app groups. Cookie ch? offline.
+- Ch?a ch?y c? 35 m?y, ch?a b?o ??m t??ng ???ng ??y ?? HBTouch.
+
+## B?ng ch?ng build
+
+CI [42855521037](https://github.com/jmehiepp/hphone-touch/actions/runs/42855521037) th?nh c?ng: 4 APT +9 daemon +9 Services +11 fleet v? b? ki?m th? C. Ki?m th? Services d?ng container/cookie gi?; kh?ng coi ?? l? ch?y tr?n iPhone.
+
+G?i 0.2.1: SHA256 `2a340f7970acf5853d1607e667dcda49f5916bfe089ef0cd762522cbf8a3a91d`, k?ch th??c2.203.998 bytes. C?c log/b?n ?nh th? ri?ng n?m trong workspace `analysis/hphone_touch_build`, kh?ng publish l?n GitHub.

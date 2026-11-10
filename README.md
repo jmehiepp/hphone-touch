@@ -1,74 +1,72 @@
 # HPhone Touch
 
-Công cụ tự động hóa Lua độc lập cho iPhone dùng Dopamine RootHide. **0.1.10 đã qua kiểm tra các chức năng cốt lõi trên iPhone 6s, iOS 15.8.4, RootHide 3.0.13-30.** Đây vẫn là bản thử nghiệm; chưa kiểm tra sau reboot/jailbreak lại hoặc trên cả dàn máy, chưa tương đương đầy đủ HBTouch.
+C?ng c? Lua ??c l?p cho iPhone d?ng Dopamine RootHide, k?m giao di?n iPhone/web v? b? ?i?u khi?n USB cho Windows. B?n **0.2.1** ?? ???c c?i v? ki?m tra m?t ph?n tr?n iPhone 6s, iOS 15.8.4, RootHide 3.0.13-30. Ch?a t??ng ???ng ??y ?? HBTouch v? ch?a ki?m tra c? d?n 35 m?y.
 
-Kho Sileo đang hoạt động: `https://jmehiepp.github.io/hphone-touch/`. GitHub Actions chỉ xuất bản sau khi build và kiểm tra thành công. Đây là kho APT riêng, Sileo là ứng dụng đọc kho. Release hiện chưa ký GPG; khi cài bằng CLI trên máy thử, gói được tải qua HTTPS, kiểm SHA256 rồi cài bằng dpkg.
+Kho Sileo: `https://jmehiepp.github.io/hphone-touch/`. ??y l? kho APT ri?ng, Release ch?a k? GPG. G?i d?ng ki?n tr?c Debian `iphoneos-arm64e` theo quy ??c RootHide; c? ba Mach-O th?c t? ???c build ARM64 ALL, minimum iOS 15.0 ?? ph? h?p iPhone 6s.
 
-## Chức năng
+## Ch?c n?ng v? b?ng ch?ng
 
-| Phần | Bản 0.1 |
-| --- | --- |
-| App iPhone và giao diện web thích ứng | Đã mở và quan sát trên máy thử |
-| Danh sách, đọc, lưu, xóa script `.lua` | Đã thử trên máy |
-| Lua 5.4.9, log, chạy một script, dừng hợp tác | Đã thử chạy và dừng vòng lặp trên máy |
-| Chạm pixel, Home/Power/âm lượng | Đã xác nhận chạm nút chạy và Home; chưa thử Power/âm lượng |
-| Chụp màn hình PNG | Đã đối chiếu ảnh 750×1334 với màn hình thật |
-| OCR | Vision Fast/CPU qua CVPixelBuffer; đã trả 16 khối chữ trên UI app, daemon giữ nguyên PID |
-| Swipe, tìm ảnh/màu, bật app, nhập chữ, overlay | Chưa có |
-| Cookie, keychain, wipe, backup/restore app | Chưa có |
-| Điều phối 35 máy và 169 API tài liệu bản gốc | Chưa có |
+| Nh?m | B?n 0.2.1 | Ki?m ch?ng |
+| --- | --- | --- |
+| Script Lua, t?p con, JSON/base64, log | C? | ?? ch?y tr?n 6s |
+| T?i ?a 4 script, d?ng ri?ng ho?c t?t c? | C? | ?? ch?y tr?n 6s v? ki?m th? host |
+| H?n gi? l?u b?n, t? ch?y | C? | Host ?? th? h?n gi? qua restart; reboot/respring tr?n iPhone ch?a th? |
+| Ch?m, gi?, vu?t, ???ng vu?t, pinch, ?a ?i?m | C? | Ch?m ?? ?i?u khi?n h?p Trust; c?c c? ch? m?i c?n c?n th? t?c ??ng th?t |
+| Ph?m HID, nh?p ASCII v? Unicode qua clipboard | C? | Bi?n d?ch ??t; nh?p ch? m?i ch?a x?c minh tr?n m?y |
+| M?u, m?u nhi?u m?u, crop, t?m ?nh SAD | C? | Pixel ??i chi?u PNG, t?m m?u v? t?m crop ?? ??t tr?n 6s |
+| OCR Vision v? Tesseract en/vi | C? | C? hai engine tr? k?t qu?/h?p pixel tr?n v?ng header; daemon gi? nguy?n PID. Ch?a ?o ?? ch?nh x?c ti?ng Vi?t ??y ?? |
+| Danh s?ch app, th?ng tin m?y, ??c radios/proxy | C? | ?? g?i th?nh c?ng tr?n 6s |
+| M?/t?t app, audio, thay radios/proxy | C? c? ch? native | Ch?a ki?m ch?ng thao t?c tr?n m?y |
+| Backup/restore/wipe app | Ch? d? li?u app ?? d?ng | 9 ki?m th? Services tr?n d? li?u gi?; ch?a th? tr?n d? li?u app th?t. Kh?ng c? keychain/app groups |
+| Cookie Safari | Ch? file offline khi Safari ?? ??ng | Parser v? thay/kh?i ph?c theo domain ?? th? b?ng cookie gi?; kh?ng c? truy c?p live Safari |
+| Toast/dialog v? n?t n?i SpringBoard | C? helper t?y ch?n | N?t n?i t?t m?c ??nh, ch?a n?p/ki?m ch?ng tr?n SpringBoard th?t; kh?ng t? respring |
+| ?i?u ph?i USB t? PC | C? | 11 ki?m th?, EXE selftest v? m?t m?y th?t; ch?a th? 35 m?y |
 
-Không dùng binary, tài nguyên, máy chủ cấp phép hoặc thương hiệu HBTouch. Báo cáo REA trước đó là tài liệu tham khảo phạm vi và hành vi, không phải chứng nhận tương thích.
+[B?ng ??i chi?u 169 m?c tham chi?u](docs/PARITY.md) ph?n bi?t ph?n c? m?, ph?n gi?i h?n v? ph?n ch?a c?. 169 m?c g?m c? dashboard, h?ng s? v? ghi ch?, kh?ng ph?i 169 API native ?? ???c x?c minh. Ch?a c? keychain li?n ?ng d?ng, ??nh d?ng m? h?a `.hb`, GPS, thao t?c Photos, gi? s?ng to?n h? th?ng ho?c ?i?u khi?n Safe Mode ??y ??. Kh?ng d?ng binary, t?i nguy?n, m?y ch? c?p ph?p ho?c m? dashboard HBTouch.
 
-## Cài và kiểm tra
+## C?i tr?n iPhone
 
-1. iPhone phải jailbreak bằng **Dopamine RootHide**; chưa hỗ trợ rootless thông thường hoặc máy chưa jailbreak.
-2. Sau khi kho đã xuất bản, thêm URL trên trong Sileo → Sources → +, tìm **HPhone Touch**.
-3. Mở app, chạy `hello.lua`; kiểm tra log đủ ba bước. Chạy `while true do end` rồi bấm Dừng để kiểm tra hook hủy.
-4. Chụp màn hình; đối chiếu ảnh với máy. Kiểm tra một chạm ở màn hình chính và Home; xác nhận bằng mắt. Thử OCR với chữ rõ trên màn hình.
-5. Gỡ/cài lại gói, kiểm tra script vẫn giữ. Khởi động lại và jailbreak lại, xác nhận daemon/app hoạt động với jbroot mới.
+1. Jailbreak b?ng Dopamine RootHide, th?m kho tr?n v?o Sileo v? c?i HPhone Touch. Ch?a h? tr? rootless th??ng ho?c m?y ch?a jailbreak.
+2. G?i ph? thu?c `libtesseract5` t? Procursus RootHide. Model en/vi t?i t? upstream ch?nh th?c, ghim commit/SHA256, ???c ??ng g?i c?ng gi?y ph?p Apache-2.0.
+3. M? app, ch?y `hello.lua`, th? d?ng v?ng l?p r?i ki?m tra ?nh/m?u/OCR. Xem [bi?n b?n thi?t b?](docs/DEVICE_TEST.md).
+4. Ch? b?t [overlay](docs/OVERLAY.md) sau khi c? ?i?u ki?n ki?m tra l?n n?p SpringBoard ti?p theo. C?i g?i kh?ng t? respring ho?c s?a bootstrap.
 
-Kết quả thực tế và các ca còn chưa chạy nằm trong [biên bản thiết bị](docs/DEVICE_TEST.md). Hoàn tất các ca còn lại trước khi triển khai nhiều máy.
-
-## Lua API
+## Lua
 
 ```lua
-print('Bắt đầu')
-sleep(1)                 -- giây; tối đa 86400
-tap(100, 200)            -- pixel ảnh gốc, hướng dọc
-key('home')              -- home, power, volumeUp, volumeDown
-local png = screenshot() -- chuỗi bytes PNG
-local text = ocr()       -- mảng {text, confidence, x, y, w, h}
-for _, row in ipairs(text) do print(row.text) end
+local w, h = getScreenResolution()
+print(w, h)
+local points = findColors({{0x007AFF, 0, 0}}, 1, nil, false, false, false, 15)
+print(table.tostring(points))
+for _, item in ipairs(ocr({engine='tesseract', languages={'vi'}})) do
+  print(item.text, item.centerX, item.centerY)
+end
 ```
 
-OCR dùng tọa độ chuẩn hóa 0–1, gốc trái dưới. Chạm gửi sự kiện IOHID không xác nhận app đích đã nhận. Cầu không dùng được sẽ báo lỗi rõ. Dừng dựa trên hook Lua và `sleep`; không ngắt cưỡng bức hàm C đang chờ hay tiến trình do script tự mở. Lua mở thư viện chuẩn, script chạy với quyền `mobile`; chỉ chạy script tin cậy. Không cấp quyền root cho daemon.
+T?a ?? m?i d?ng pixel theo h??ng d?c, g?c tr?i tr?n. `screenshot(path, region)` l?u ?nh v? tr? ???ng d?n; `screenshotBytes()` tr? chu?i PNG cho giao di?n c?. OCR m?i tr? h?p pixel; `HPOCR` n?i b? c? v?n gi? ??nh d?ng chu?n h?a. Swipe tuy?n t?nh, t?m ?nh SAD c? gi?i h?n c?ng vi?c v? s? k?t qu?; xem [giao di?n native](docs/NATIVE_BRIDGE.md).
 
-OCR dùng chế độ Fast/CPU để phù hợp iPhone 6s; độ chính xác và ngôn ngữ nhận dạng phụ thuộc Vision trên iOS của máy. Daemon đặt và đọc lại giới hạn 256 MiB cho chính PID của mình; chỉ cho chạy một OCR mỗi lần. Kết quả áp dụng giới hạn có trong `/api/status`.
+Script l? m? tin c?y, ch?y v?i user mobile v? c? th? vi?n Lua chu?n. M?i VM gi?i h?n heap 32 MiB; d?ng c? ki?m tra trong Lua/sleep/input/t?m ?nh/HTTP. M?t s? service call ch? k?t th?c theo timeout ri?ng. C?c script d?ng chung m?n h?nh th?t. Daemon ??t v? ??c l?i gi?i h?n 256 MiB cho ch?nh PID, kh?ng ??i gi?i h?n to?n h? th?ng.
 
-Lua được biên dịch với `LUA_USE_IOS`; `os.execute` không khả dụng theo cấu hình iOS chính thức của Lua. Giới hạn heap Lua là 32 MiB mỗi lần chạy; log giữ tối đa 500 dòng, mỗi dòng 4096 ký tự.
+## PC v? truy c?p API
 
-## Truy cập từ PC
+[H??ng d?n Windows/USB](docs/FLEET.md), [m? PC](pc/). M?i iPhone nh?p m?t kh?u SSH v?o ? k?n ri?ng, l?y token/c?ng qua USB r?i d?ng API. M?t kh?u kh?ng ghi ra ??a; kh?a m?y ch? SSH ???c ghim ri?ng theo UDID. B? ?i?u khi?n c? t?i ?a 4 worker, l?i t?ng m?y ??c l?p.
 
-Daemon chỉ nghe loopback `127.0.0.1`, không mở LAN. Nó ưu tiên cổng đã lưu (mặc định 8765); nếu cổng bận, hệ thống chọn cổng trống. Cổng thực tế lưu ở `/var/mobile/Library/HPhoneTouch/port`, quyền `0600`; app đọc tự động. Mọi API yêu cầu header `X-HPhone-Token`; token riêng thiết bị lưu quyền `0600` ở `/var/mobile/Library/HPhoneTouch/token`. Từ PC, chuyển tiếp USB đến cổng đọc từ file `port`, mở địa chỉ chuyển tiếp và nhập token vào giao diện. Token giữ trong sessionStorage của tab. Hiện chưa tích hợp chuyển tiếp hay lấy token tự động vào RootHideFleet.
+Daemon ch? nghe loopback. C?ng th?c t? ? `/var/mobile/Library/HPhoneTouch/port`; n?u c?ng m?c ??nh 8765 b?n th? ch?n c?ng tr?ng, kh?ng d?ng d?ch v? kh?c. Token ri?ng thi?t b? ? file `token`, mode 0600. M?i `/api/*` y?u c?u `X-HPhone-Token`; thao t?c thay ??i d?ng POST. Kh?ng m? LAN. `/api/summary` d?nh cho PC, kh?ng ??nh k?m to?n b? log.
 
-Các API thay đổi trạng thái chỉ dùng POST. HTTP giới hạn header 16 KiB, JSON 1 MiB, timeout 5 giây; chỉ phục vụ ba tài nguyên tĩnh cố định. Thư mục script giới hạn tên phẳng `.lua`; API lưu từ chối symlink cuối đường dẫn. Chưa có HTTPS vì chỉ nghe loopback.
+??y l? c?ng c? ?i?u khi?n sau jailbreak. C?ng c? RootHide Fleet Auto trong workspace ph? tr?ch nh?n m?y/chu?n b? jailbreak; thao t?c Jailbreak trong app ch?nh th?c v?n c?n b?m tr?n iPhone.
 
-## Build
+## Build v? ki?m th?
 
-Trên macOS với Xcode và [RootHide Theos](https://github.com/roothide/theos):
+Tr?n macOS/Xcode v?i RootHide Theos:
 
 ```sh
-export THEOS=/path/to/theos
 python3 scripts/fetch_lua.py
+python3 scripts/fetch_tessdata.py
+python3 scripts/api_index.py
 gmake package FINALPACKAGE=1
 python3 scripts/apt_repo.py packages repo-out
 ```
 
-Lua tải từ repo chính thức `lua/lua`, commit của tag 5.4.9 và SHA256 được ghim trước khi giải nén. Theos cũng ghim commit, dùng SDK iPhoneOS của Xcode. Pipeline kiểm tra ARM64 ALL (không yêu cầu CPU ARM64e), minimum iOS ≤15.0, plist, launch daemon, maintainer script, web và giấy phép trước khi publish. Tên kiến trúc Debian `iphoneos-arm64e` là quy ước RootHide, không phải yêu cầu chip A12.
+CI ghim RootHide Theos v? Lua 5.4.9, ch?y 4 ki?m th? APT, 9 daemon, 9 Services, 11 fleet c?ng b? ki?m th? C cho m?u/?nh; compile/link/sign app, daemon, overlay ARM64. Ch? publish APT sau khi c?c ki?m tra v? ki?m tra payload ??t. Host tests d?ng bridge b?o unavailable v? d? li?u gi?; k?t qu? m?y th?t ???c ghi ri?ng. Source s?a b?n 0.2.1: `80d4f1a9d8b4a6b9f0c4f715ccc3c5300af9c635`.
 
-GitHub Actions ghi bản kho phẳng vào nhánh `gh-pages` và triển khai trực tiếp qua `deploy-pages`; Pages chọn nguồn **GitHub Actions**. Pipeline chỉ publish khi compile và kiểm gói thành công; chưa thay thế kiểm thử runtime trên iPhone. Theo [API RootHide chính thức](https://github.com/roothide/Developer), code native gọi `jbroot()` khi đọc tài nguyên bootstrap; script/plist dùng đường dẫn jbroot. Không sửa bootstrap hay gỡ jailbreak khi cài tool.
-
-## Giấy phép
-
-Mã HPhone Touch: MIT. Lua giữ giấy phép MIT của Lua trong `lua.h`, README chính thức và gói cài. Apple frameworks và Theos không được phân phối kèm binary của dự án.
+M? HPhone Touch: MIT. Lua gi? MIT; tessdata_fast gi? Apache-2.0. Apple frameworks kh?ng ???c ??ng g?i k?m.
