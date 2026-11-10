@@ -52,7 +52,7 @@ static CGImageRef capture(void) {
 NSDictionary *HPCapabilities(void) {
     setup(); return @{@"lua":@YES,@"scripts":@YES,@"screenBridgePresent":@(mainDisplay&&surfaceForLayer),
         @"touchBridgePresent":@(client&&digitizer&&finger&&appendEvent&&dispatchEvent),@"keyBridgePresent":@(client&&keyboard&&dispatchEvent),
-        @"deviceValidation":@"required",@"version":@"0.1.0"};
+        @"deviceValidation":@"required",@"version":@"0.1.1"};
 }
 NSData *HPScreenshot(void) {
     CGImageRef image=capture(); if(!image) return nil;

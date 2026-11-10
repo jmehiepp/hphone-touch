@@ -1,6 +1,6 @@
 # HPhone Touch
 
-Công cụ tự động hóa Lua độc lập cho iPhone dùng Dopamine RootHide. Mục tiêu đầu tiên: iPhone 6s (ARM64), iOS 15.x. **0.1.0 là bản thử nghiệm, chưa được xác nhận hoạt động trên thiết bị. Không tuyên bố tương đương đầy đủ HBTouch.**
+Công cụ tự động hóa Lua độc lập cho iPhone dùng Dopamine RootHide. Mục tiêu đầu tiên: iPhone 6s (ARM64), iOS 15.x. **0.1.1 là bản thử nghiệm, đang kiểm tra trên thiết bị. Không tuyên bố tương đương đầy đủ HBTouch.**
 
 Kho Sileo dự kiến: `https://jmehiepp.github.io/hphone-touch/`. Chỉ có gói sau khi GitHub Actions build và kiểm tra thành công. Đây là kho APT riêng, Sileo là ứng dụng đọc kho. Release hiện chưa ký GPG.
 
@@ -48,7 +48,7 @@ Lua được biên dịch với `LUA_USE_IOS`; `os.execute` không khả dụng 
 
 ## Truy cập từ PC
 
-Daemon chỉ nghe `127.0.0.1:8765`, không mở LAN. Mọi API yêu cầu header `X-HPhone-Token`; token riêng thiết bị lưu quyền `0600` ở `/var/mobile/Library/HPhoneTouch/token`. App iPhone đọc token trực tiếp. Từ PC có thể chuyển tiếp USB đến cổng 8765, mở `http://127.0.0.1:8765` và nhập token vào giao diện. Token giữ trong sessionStorage của tab. Hiện chưa tích hợp chuyển tiếp hay lấy token tự động vào RootHideFleet.
+Daemon chỉ nghe loopback `127.0.0.1`, không mở LAN. Nó ưu tiên cổng đã lưu (mặc định 8765); nếu cổng bận, hệ thống chọn cổng trống. Cổng thực tế lưu ở `/var/mobile/Library/HPhoneTouch/port`, quyền `0600`; app đọc tự động. Mọi API yêu cầu header `X-HPhone-Token`; token riêng thiết bị lưu quyền `0600` ở `/var/mobile/Library/HPhoneTouch/token`. Từ PC, chuyển tiếp USB đến cổng đọc từ file `port`, mở địa chỉ chuyển tiếp và nhập token vào giao diện. Token giữ trong sessionStorage của tab. Hiện chưa tích hợp chuyển tiếp hay lấy token tự động vào RootHideFleet.
 
 Các API thay đổi trạng thái chỉ dùng POST. HTTP giới hạn header 16 KiB, JSON 1 MiB, timeout 5 giây; chỉ phục vụ ba tài nguyên tĩnh cố định. Thư mục script giới hạn tên phẳng `.lua`; API lưu từ chối symlink cuối đường dẫn. Chưa có HTTPS vì chỉ nghe loopback.
 

@@ -20,8 +20,9 @@ class DaemonTests(unittest.TestCase):
         cls.proc = subprocess.Popen([sys.argv[1]], env=env)
         for _ in range(100):
             path = cls.base/"token"
-            if path.exists():
+            if path.exists() and (cls.base/"port").exists():
                 cls.token = path.read_text()
+                cls.port = int((cls.base/"port").read_text())
                 try:
                     if cls.request("GET", "/api/status")[0] == 200:
                         return
@@ -40,7 +41,7 @@ class DaemonTests(unittest.TestCase):
 
     @classmethod
     def request(cls, method, path, body=None, auth=True):
-        conn = http.client.HTTPConnection("127.0.0.1", 8765, timeout=5)
+        conn = http.client.HTTPConnection("127.0.0.1", cls.port, timeout=5)
         headers = {"X-HPhone-Token": cls.token} if auth else {}
         if body is not None:
             headers["Content-Type"] = "application/json"
@@ -70,6 +71,26 @@ class DaemonTests(unittest.TestCase):
         self.assertIn(b"HPhone Touch", self.request("GET", "/", auth=False)[1])
         self.assertEqual(self.request("GET", "/../control", auth=False)[0], 404)
         self.assertEqual((self.base/"token").stat().st_mode & 0o777, 0o600)
+
+    def test_busy_port_selects_free_loopback_port(self):
+        with tempfile.TemporaryDirectory() as folder:
+            base=Path(folder)
+            env=dict(os.environ,HPHONE_TEST_DATA=folder,HPHONE_TEST_WEB=str(ROOT/"web"))
+            # Force the second daemon to try the port already occupied by this one.
+            (base/"port").write_text(str(self.port))
+            proc=subprocess.Popen([sys.argv[1]],env=env)
+            try:
+                for _ in range(100):
+                    if proc.poll() is not None:self.fail("Second daemon exited on a port conflict")
+                    port=int((base/"port").read_text())
+                    if port!=self.port and (base/"token").exists():break
+                    time.sleep(.05)
+                else:self.fail("Second daemon did not publish a free port")
+                conn=http.client.HTTPConnection("127.0.0.1",port,timeout=5)
+                conn.request("GET","/api/status",headers={"X-HPhone-Token":(base/"token").read_text()})
+                response=conn.getresponse();self.assertEqual(response.status,200);response.read();conn.close()
+                self.assertEqual((base/"port").stat().st_mode & 0o777,0o600)
+            finally:proc.terminate();proc.wait(timeout=5)
 
     def test_script_roundtrip_and_paths(self):
         self.call("file", {"action":"save", "name":"test.lua", "content":"print('Tiếng Việt')"})

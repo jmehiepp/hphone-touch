@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <math.h>
+#include <errno.h>
 #include <stdatomic.h>
 #include <stdlib.h>
 #ifdef HP_HOST_TEST
@@ -120,9 +121,21 @@ int main(void){@autoreleasepool {
     if(token.length<32){token=[NSUUID.UUID.UUIDString stringByReplacingOccurrencesOfString:@"-" withString:@""];if(![token writeToFile:tokenPath atomically:YES encoding:NSUTF8StringEncoding error:NULL])return 2;}
     chmod(tokenPath.fileSystemRepresentation,0600);webRoot=jbroot(@"/usr/share/hphone-touch/web");
     NSString *sample=[scripts stringByAppendingPathComponent:@"hello.lua"];if(![fm fileExistsAtPath:sample])[@"print('Hello from HPhone Touch')\nfor i=1,3 do\n  print('Step',i)\n  sleep(1)\nend\n" writeToFile:sample atomically:YES encoding:NSUTF8StringEncoding error:NULL];
-    int server=socket(AF_INET,SOCK_STREAM,0),yes=1;setsockopt(server,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(yes));struct sockaddr_in addr={0};addr.sin_family=AF_INET;addr.sin_port=htons(8765);addr.sin_addr.s_addr=htonl(INADDR_LOOPBACK);
-    if(bind(server,(struct sockaddr *)&addr,sizeof(addr))||listen(server,8))return 3;
+    NSString *portPath=[base stringByAppendingPathComponent:@"port"];
+    NSInteger savedPort=[[NSString stringWithContentsOfFile:portPath encoding:NSUTF8StringEncoding error:NULL] integerValue];
+    int preferredPort=(savedPort>=1024&&savedPort<=65535)?(int)savedPort:8765;
+    int server=socket(AF_INET,SOCK_STREAM,0),yes=1;setsockopt(server,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof(yes));struct sockaddr_in addr={0};addr.sin_family=AF_INET;addr.sin_port=htons(preferredPort);addr.sin_addr.s_addr=htonl(INADDR_LOOPBACK);
+    if(bind(server,(struct sockaddr *)&addr,sizeof(addr))||listen(server,8)) {
+        if(errno!=EADDRINUSE){close(server);return 3;}
+        close(server);server=socket(AF_INET,SOCK_STREAM,0);addr.sin_port=0;
+        if(bind(server,(struct sockaddr *)&addr,sizeof(addr))||listen(server,8)){close(server);return 3;}
+    }
+    socklen_t addrSize=sizeof(addr);
+    if(getsockname(server,(struct sockaddr *)&addr,&addrSize)){close(server);return 3;}
+    NSString *portValue=[NSString stringWithFormat:@"%u",ntohs(addr.sin_port)];
+    if(![portValue writeToFile:portPath atomically:YES encoding:NSUTF8StringEncoding error:NULL]){close(server);return 3;}
+    chmod(portPath.fileSystemRepresentation,0600);
     // Four workers keep stop/status available while an OCR request is executing.
     for(int i=0;i<4;i++)dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED,0),^{for(;;){int fd=accept(server,NULL,NULL);if(fd>=0){serve(fd);close(fd);}}});
-    logLine(@"HPhone Touch 0.1.0 ready; native bridges require device testing");dispatch_main();return 0;
+    logLine(@"HPhone Touch 0.1.1 ready; native bridges require device testing");dispatch_main();return 0;
 }}

@@ -9,13 +9,15 @@
 - (void)loadPage {
     self.attempts++;
     NSString *token=[NSString stringWithContentsOfFile:@"/var/mobile/Library/HPhoneTouch/token" encoding:NSUTF8StringEncoding error:NULL] ?: @"";
-    if(token.length<32){[self retry];return;}
+    NSInteger port=[[NSString stringWithContentsOfFile:@"/var/mobile/Library/HPhoneTouch/port" encoding:NSUTF8StringEncoding error:NULL] integerValue];
+    if(token.length<32||port<1024||port>65535){[self retry];return;}
     NSData *encoded=[NSJSONSerialization dataWithJSONObject:@[token] options:0 error:NULL];
     NSString *json=[[NSString alloc] initWithData:encoded encoding:NSUTF8StringEncoding];
-    NSString *script=[NSString stringWithFormat:@"if(location.origin==='http://127.0.0.1:8765'){window.HPHONE_TOKEN=(%@)[0];}",json];
+    NSString *script=[NSString stringWithFormat:@"if(location.origin==='http://127.0.0.1:%ld'){window.HPHONE_TOKEN=(%@)[0];}",(long)port,json];
     [self.web.configuration.userContentController removeAllUserScripts];
     [self.web.configuration.userContentController addUserScript:[[WKUserScript alloc] initWithSource:script injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:YES]];
-    [self.web loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://127.0.0.1:8765/"]]];
+    NSString *address=[NSString stringWithFormat:@"http://127.0.0.1:%ld/",(long)port];
+    [self.web loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:address]]];
 }
 - (void)retry {
     if(self.attempts<10){dispatch_after(dispatch_time(DISPATCH_TIME_NOW,NSEC_PER_SEC),dispatch_get_main_queue(),^{[self loadPage];});}
