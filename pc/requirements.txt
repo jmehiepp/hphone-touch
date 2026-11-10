@@ -1,0 +1,2 @@
+pymobiledevice3==11.50.3
+paramiko==5.1.0

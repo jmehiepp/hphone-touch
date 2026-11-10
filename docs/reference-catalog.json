@@ -1,0 +1,682 @@
+{
+  "evidence": "Names declared in shipped HBTouch 0.1.0 docs; no runtime equivalence implied",
+  "sha256": "e5ac6cafde2b729f335deb5da590cccb596f807131a5bb0b1fd99b27cded3e23",
+  "items": [
+    {
+      "name": "editor",
+      "group": "Hướng dẫn Dashboard"
+    },
+    {
+      "name": "screen",
+      "group": "Hướng dẫn Dashboard"
+    },
+    {
+      "name": "multi",
+      "group": "Hướng dẫn Dashboard"
+    },
+    {
+      "name": "docs",
+      "group": "Hướng dẫn Dashboard"
+    },
+    {
+      "name": "multi-run",
+      "group": "Hướng dẫn Dashboard"
+    },
+    {
+      "name": "log",
+      "group": "Hướng dẫn Dashboard"
+    },
+    {
+      "name": "encrypt",
+      "group": "Hướng dẫn Dashboard"
+    },
+    {
+      "name": "paths",
+      "group": "Hướng dẫn Dashboard"
+    },
+    {
+      "name": "tap",
+      "group": "Touch / cử chỉ"
+    },
+    {
+      "name": "doubleTap",
+      "group": "Touch / cử chỉ"
+    },
+    {
+      "name": "longPress",
+      "group": "Touch / cử chỉ"
+    },
+    {
+      "name": "touchDown",
+      "group": "Touch / cử chỉ"
+    },
+    {
+      "name": "touchMove",
+      "group": "Touch / cử chỉ"
+    },
+    {
+      "name": "touchUp",
+      "group": "Touch / cử chỉ"
+    },
+    {
+      "name": "swipe",
+      "group": "Touch / cử chỉ"
+    },
+    {
+      "name": "swipeHold",
+      "group": "Touch / cử chỉ"
+    },
+    {
+      "name": "swipePath",
+      "group": "Touch / cử chỉ"
+    },
+    {
+      "name": "pinch",
+      "group": "Touch / cử chỉ"
+    },
+    {
+      "name": "scroll",
+      "group": "Touch / cử chỉ"
+    },
+    {
+      "name": "usleep",
+      "group": "Touch / cử chỉ"
+    },
+    {
+      "name": "sleep",
+      "group": "Touch / cử chỉ"
+    },
+    {
+      "name": "keyPress",
+      "group": "Touch / cử chỉ"
+    },
+    {
+      "name": "keyDown",
+      "group": "Touch / cử chỉ"
+    },
+    {
+      "name": "keyUp",
+      "group": "Touch / cử chỉ"
+    },
+    {
+      "name": "inputText",
+      "group": "Touch / cử chỉ"
+    },
+    {
+      "name": "getScreenResolution",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "getScreenSize",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "getScreenScale",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "getOrientation",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "getColor",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "getColors",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "findColor",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "findColors",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "findMultiColor",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "findColorList",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "getColorCount",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "isColor",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "matchColors",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "findImage",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "findImageTap",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "waitImage",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "waitImageTap",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "tapImage",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "screenshot",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "setColorTolerance",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "dumpColorsOfScreen",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "ocr",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "setOcrEngine",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "getText",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "findText",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "tapText",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "waitText",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "tapColors",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "tapColor",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "tapMultiColor",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "findColorTap",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "findColorsTap",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "waitColor",
+      "group": "Màn hình / màu / ảnh"
+    },
+    {
+      "name": "keep",
+      "group": "Lặp / chờ (keep)"
+    },
+    {
+      "name": "keepFindingColor",
+      "group": "Lặp / chờ (keep)"
+    },
+    {
+      "name": "keepFindingColors",
+      "group": "Lặp / chờ (keep)"
+    },
+    {
+      "name": "keepFindingColorTap",
+      "group": "Lặp / chờ (keep)"
+    },
+    {
+      "name": "keepFindingColorsTap",
+      "group": "Lặp / chờ (keep)"
+    },
+    {
+      "name": "appRun",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "appKill",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "appActivate",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "appState",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "appIsActive",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "appInfo",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "frontMostAppId",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "runningApps",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "lockScreen",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "unlockScreen",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "isScreenLocked",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "openURL",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "execute",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "respring",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "copyText",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "clipText",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "vibrate",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "getSN",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "getLocalIP",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "getVersion",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "captureDebugInfo",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "memoryUsageOfApp",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "memoryUsageOfTotal",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "keepAutoTouchAwake",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "isKeepingAutoTouchAwake",
+      "group": "Ứng dụng / hệ thống"
+    },
+    {
+      "name": "toast",
+      "group": "Giao diện (app HBTouch)"
+    },
+    {
+      "name": "alert",
+      "group": "Giao diện (app HBTouch)"
+    },
+    {
+      "name": "dialog",
+      "group": "Giao diện (app HBTouch)"
+    },
+    {
+      "name": "clearDialogValues",
+      "group": "Giao diện (app HBTouch)"
+    },
+    {
+      "name": "runScript",
+      "group": "Chạy / dừng script"
+    },
+    {
+      "name": "stopScript",
+      "group": "Chạy / dừng script"
+    },
+    {
+      "name": "stopAllScripts",
+      "group": "Chạy / dừng script"
+    },
+    {
+      "name": "runningScripts",
+      "group": "Chạy / dừng script"
+    },
+    {
+      "name": "isScriptRunning",
+      "group": "Chạy / dừng script"
+    },
+    {
+      "name": "http-control",
+      "group": "Chạy / dừng script"
+    },
+    {
+      "name": "setTimer",
+      "group": "Hẹn giờ / tự chạy"
+    },
+    {
+      "name": "removeTimer",
+      "group": "Hẹn giờ / tự chạy"
+    },
+    {
+      "name": "setAutoLaunch",
+      "group": "Hẹn giờ / tự chạy"
+    },
+    {
+      "name": "listAutoLaunch",
+      "group": "Hẹn giờ / tự chạy"
+    },
+    {
+      "name": "playAudio",
+      "group": "Âm thanh / ảnh"
+    },
+    {
+      "name": "stopAudio",
+      "group": "Âm thanh / ảnh"
+    },
+    {
+      "name": "pauseAudio",
+      "group": "Âm thanh / ảnh"
+    },
+    {
+      "name": "resumeAudio",
+      "group": "Âm thanh / ảnh"
+    },
+    {
+      "name": "saveToSystemAlbum",
+      "group": "Âm thanh / ảnh"
+    },
+    {
+      "name": "clearSystemAlbum",
+      "group": "Âm thanh / ảnh"
+    },
+    {
+      "name": "millis",
+      "group": "Log / script / tiện ích"
+    },
+    {
+      "name": "log",
+      "group": "Log / script / tiện ích"
+    },
+    {
+      "name": "clearLog",
+      "group": "Log / script / tiện ích"
+    },
+    {
+      "name": "stop",
+      "group": "Log / script / tiện ích"
+    },
+    {
+      "name": "rootDir",
+      "group": "Log / script / tiện ích"
+    },
+    {
+      "name": "currentDir",
+      "group": "Log / script / tiện ích"
+    },
+    {
+      "name": "botPath",
+      "group": "Log / script / tiện ích"
+    },
+    {
+      "name": "intToRgb",
+      "group": "Log / script / tiện ích"
+    },
+    {
+      "name": "rgbToInt",
+      "group": "Log / script / tiện ích"
+    },
+    {
+      "name": "centerOffsetOfPoints",
+      "group": "Log / script / tiện ích"
+    },
+    {
+      "name": "centerOffsetOfPixels",
+      "group": "Log / script / tiện ích"
+    },
+    {
+      "name": "table.tostring",
+      "group": "Log / script / tiện ích"
+    },
+    {
+      "name": "string.startswith",
+      "group": "Log / script / tiện ích"
+    },
+    {
+      "name": "airplaneMode",
+      "group": "Sóng / kết nối"
+    },
+    {
+      "name": "wifi",
+      "group": "Sóng / kết nối"
+    },
+    {
+      "name": "cellularData",
+      "group": "Sóng / kết nối"
+    },
+    {
+      "name": "getRadios",
+      "group": "Sóng / kết nối"
+    },
+    {
+      "name": "★ QUAN TRỌNG",
+      "group": "Cookie Safari"
+    },
+    {
+      "name": "getCookies",
+      "group": "Cookie Safari"
+    },
+    {
+      "name": "getCookieHeader",
+      "group": "Cookie Safari"
+    },
+    {
+      "name": "getCookiesText",
+      "group": "Cookie Safari"
+    },
+    {
+      "name": "safariCookiesPath",
+      "group": "Cookie Safari"
+    },
+    {
+      "name": "getCookiesJSON",
+      "group": "Cookie Safari"
+    },
+    {
+      "name": "importCookies",
+      "group": "Cookie Safari"
+    },
+    {
+      "name": "deleteCookies",
+      "group": "Cookie Safari"
+    },
+    {
+      "name": "restoreCookies",
+      "group": "Cookie Safari"
+    },
+    {
+      "name": "auto-exit",
+      "group": "Safe Mode"
+    },
+    {
+      "name": "isSafeMode",
+      "group": "Safe Mode"
+    },
+    {
+      "name": "exitSafeMode",
+      "group": "Safe Mode"
+    },
+    {
+      "name": "setAutoExitSafeMode",
+      "group": "Safe Mode"
+    },
+    {
+      "name": "backupApp",
+      "group": "Backup / Restore"
+    },
+    {
+      "name": "restoreApp",
+      "group": "Backup / Restore"
+    },
+    {
+      "name": "wipeApp",
+      "group": "Backup / Restore"
+    },
+    {
+      "name": "deleteBackup",
+      "group": "Backup / Restore"
+    },
+    {
+      "name": "listBackups",
+      "group": "Backup / Restore"
+    },
+    {
+      "name": "listInstalledApps",
+      "group": "Backup / Restore"
+    },
+    {
+      "name": "readFile",
+      "group": "File / JSON / Base64"
+    },
+    {
+      "name": "writeFile",
+      "group": "File / JSON / Base64"
+    },
+    {
+      "name": "appendFile",
+      "group": "File / JSON / Base64"
+    },
+    {
+      "name": "removeFirstLine",
+      "group": "File / JSON / Base64"
+    },
+    {
+      "name": "readLines",
+      "group": "File / JSON / Base64"
+    },
+    {
+      "name": "fileExists",
+      "group": "File / JSON / Base64"
+    },
+    {
+      "name": "deleteFile",
+      "group": "File / JSON / Base64"
+    },
+    {
+      "name": "listDir",
+      "group": "File / JSON / Base64"
+    },
+    {
+      "name": "jsonEncode",
+      "group": "File / JSON / Base64"
+    },
+    {
+      "name": "jsonDecode",
+      "group": "File / JSON / Base64"
+    },
+    {
+      "name": "base64Encode",
+      "group": "File / JSON / Base64"
+    },
+    {
+      "name": "base64Decode",
+      "group": "File / JSON / Base64"
+    },
+    {
+      "name": "★ Kết quả trả về",
+      "group": "HTTP / API"
+    },
+    {
+      "name": "httpGet",
+      "group": "HTTP / API"
+    },
+    {
+      "name": "httpPost",
+      "group": "HTTP / API"
+    },
+    {
+      "name": "httpRequest",
+      "group": "HTTP / API"
+    },
+    {
+      "name": "setProxy",
+      "group": "Proxy Wi-Fi"
+    },
+    {
+      "name": "clearProxy",
+      "group": "Proxy Wi-Fi"
+    },
+    {
+      "name": "getProxy",
+      "group": "Proxy Wi-Fi"
+    },
+    {
+      "name": "fakeLocation",
+      "group": "Vị trí GPS"
+    },
+    {
+      "name": "clearLocation",
+      "group": "Vị trí GPS"
+    },
+    {
+      "name": "fakeLocationByIP",
+      "group": "Vị trí GPS"
+    },
+    {
+      "name": "KEY_TYPE",
+      "group": "Hằng số"
+    },
+    {
+      "name": "CONTROLLER_TYPE",
+      "group": "Hằng số"
+    },
+    {
+      "name": "ORIENTATION_TYPE",
+      "group": "Hằng số"
+    }
+  ]
+}

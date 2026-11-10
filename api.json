@@ -1,0 +1,1358 @@
+{
+  "version": "0.2.0",
+  "referenceCount": 169,
+  "items": [
+    {
+      "name": "editor",
+      "group": "Hướng dẫn Dashboard",
+      "signature": "editor",
+      "status": "partial",
+      "description": "Selection execution and shortcuts; no syntax debugger or proprietary encryption.",
+      "example": ""
+    },
+    {
+      "name": "screen",
+      "group": "Hướng dẫn Dashboard",
+      "signature": "screen",
+      "status": "partial",
+      "description": "PNG live preview, zoom, color sampling, crop, tap and swipe; no JPEG stream.",
+      "example": ""
+    },
+    {
+      "name": "multi",
+      "group": "Hướng dẫn Dashboard",
+      "signature": "multi",
+      "status": "partial",
+      "description": "Color pattern snippets; up to sixteen selected points.",
+      "example": ""
+    },
+    {
+      "name": "docs",
+      "group": "Hướng dẫn Dashboard",
+      "signature": "docs",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "multi-run",
+      "group": "Hướng dẫn Dashboard",
+      "signature": "multi-run",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "log",
+      "group": "Hướng dẫn Dashboard",
+      "signature": "log",
+      "status": "partial",
+      "description": "Bounded polling logs, no SSE or hardware-volume stop shortcut.",
+      "example": ""
+    },
+    {
+      "name": "encrypt",
+      "group": "Hướng dẫn Dashboard",
+      "signature": "encrypt",
+      "status": "unsupported",
+      "description": "The proprietary .hb container is not supported.",
+      "example": ""
+    },
+    {
+      "name": "paths",
+      "group": "Hướng dẫn Dashboard",
+      "signature": "paths",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "tap",
+      "group": "Touch / cử chỉ",
+      "signature": "tap",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "doubleTap",
+      "group": "Touch / cử chỉ",
+      "signature": "doubleTap",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "longPress",
+      "group": "Touch / cử chỉ",
+      "signature": "longPress",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "touchDown",
+      "group": "Touch / cử chỉ",
+      "signature": "touchDown",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "touchMove",
+      "group": "Touch / cử chỉ",
+      "signature": "touchMove",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "touchUp",
+      "group": "Touch / cử chỉ",
+      "signature": "touchUp",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "swipe",
+      "group": "Touch / cử chỉ",
+      "signature": "swipe",
+      "status": "partial",
+      "description": "Linear interpolation; original easing is not reproduced.",
+      "example": "swipe(600, 700, 150, 700, 400)"
+    },
+    {
+      "name": "swipeHold",
+      "group": "Touch / cử chỉ",
+      "signature": "swipeHold",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "swipePath",
+      "group": "Touch / cử chỉ",
+      "signature": "swipePath",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "pinch",
+      "group": "Touch / cử chỉ",
+      "signature": "pinch",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "scroll",
+      "group": "Touch / cử chỉ",
+      "signature": "scroll",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "usleep",
+      "group": "Touch / cử chỉ",
+      "signature": "usleep",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "sleep",
+      "group": "Touch / cử chỉ",
+      "signature": "sleep",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "keyPress",
+      "group": "Touch / cử chỉ",
+      "signature": "keyPress",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "keyDown",
+      "group": "Touch / cử chỉ",
+      "signature": "keyDown",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "keyUp",
+      "group": "Touch / cử chỉ",
+      "signature": "keyUp",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "inputText",
+      "group": "Touch / cử chỉ",
+      "signature": "inputText",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "getScreenResolution",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "getScreenResolution",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": "local w, h = getScreenResolution()\nprint(w, h)"
+    },
+    {
+      "name": "getScreenSize",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "getScreenSize",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "getScreenScale",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "getScreenScale",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "getOrientation",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "getOrientation",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "getColor",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "getColor",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "getColors",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "getColors",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "findColor",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "findColor",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "findColors",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "findColors",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": "local points = findColors({{0x007AFF, 0, 0}}, 1, nil, false, false, false, 15)\nprint(table.tostring(points))"
+    },
+    {
+      "name": "findMultiColor",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "findMultiColor",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "findColorList",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "findColorList",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "getColorCount",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "getColorCount",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "isColor",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "isColor",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "matchColors",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "matchColors",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "findImage",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "findImage",
+      "status": "partial",
+      "description": "Bounded RGB SAD search, nonoverlapping raster-order results; not score sorted.",
+      "example": ""
+    },
+    {
+      "name": "findImageTap",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "findImageTap",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "waitImage",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "waitImage",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "waitImageTap",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "waitImageTap",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "tapImage",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "tapImage",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "screenshot",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "screenshot",
+      "status": "partial",
+      "description": "Returns a saved path; screenshotBytes() preserves the earlier binary interface.",
+      "example": ""
+    },
+    {
+      "name": "setColorTolerance",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "setColorTolerance",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "dumpColorsOfScreen",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "dumpColorsOfScreen",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "ocr",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "ocr",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": "for _, item in ipairs(ocr({languages={\"vi\"}, engine=\"tesseract\"})) do print(item.text) end"
+    },
+    {
+      "name": "setOcrEngine",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "setOcrEngine",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "getText",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "getText",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "findText",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "findText",
+      "status": "partial",
+      "description": "Case-insensitive matching; Unicode accent folding is not implemented.",
+      "example": ""
+    },
+    {
+      "name": "tapText",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "tapText",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "waitText",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "waitText",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "tapColors",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "tapColors",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "tapColor",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "tapColor",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "tapMultiColor",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "tapMultiColor",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "findColorTap",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "findColorTap",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "findColorsTap",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "findColorsTap",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "waitColor",
+      "group": "Màn hình / màu / ảnh",
+      "signature": "waitColor",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "keep",
+      "group": "Lặp / chờ (keep)",
+      "signature": "keep",
+      "status": "partial",
+      "description": "Waits at most24hours per invocation, instead of infinite native waiting.",
+      "example": ""
+    },
+    {
+      "name": "keepFindingColor",
+      "group": "Lặp / chờ (keep)",
+      "signature": "keepFindingColor",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "keepFindingColors",
+      "group": "Lặp / chờ (keep)",
+      "signature": "keepFindingColors",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "keepFindingColorTap",
+      "group": "Lặp / chờ (keep)",
+      "signature": "keepFindingColorTap",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "keepFindingColorsTap",
+      "group": "Lặp / chờ (keep)",
+      "signature": "keepFindingColorsTap",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "appRun",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "appRun",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "appKill",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "appKill",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "appActivate",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "appActivate",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "appState",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "appState",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "appIsActive",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "appIsActive",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "appInfo",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "appInfo",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "frontMostAppId",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "frontMostAppId",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "runningApps",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "runningApps",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "lockScreen",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "lockScreen",
+      "status": "unsupported",
+      "description": "Requires a verified lock/unlock helper.",
+      "example": ""
+    },
+    {
+      "name": "unlockScreen",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "unlockScreen",
+      "status": "unsupported",
+      "description": "Requires a verified lock/unlock helper.",
+      "example": ""
+    },
+    {
+      "name": "isScreenLocked",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "isScreenLocked",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "openURL",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "openURL",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "execute",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "execute",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "respring",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "respring",
+      "status": "unsupported",
+      "description": "No automatic SpringBoard restart in this build.",
+      "example": ""
+    },
+    {
+      "name": "copyText",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "copyText",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "clipText",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "clipText",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "vibrate",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "vibrate",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "getSN",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "getSN",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "getLocalIP",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "getLocalIP",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "getVersion",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "getVersion",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "captureDebugInfo",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "captureDebugInfo",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "memoryUsageOfApp",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "memoryUsageOfApp",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "memoryUsageOfTotal",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "memoryUsageOfTotal",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "keepAutoTouchAwake",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "keepAutoTouchAwake",
+      "status": "unsupported",
+      "description": "A system-wide idle assertion is not implemented.",
+      "example": ""
+    },
+    {
+      "name": "isKeepingAutoTouchAwake",
+      "group": "Ứng dụng / hệ thống",
+      "signature": "isKeepingAutoTouchAwake",
+      "status": "unsupported",
+      "description": "No active system-wide idle assertion.",
+      "example": ""
+    },
+    {
+      "name": "toast",
+      "group": "Giao diện (app HBTouch)",
+      "signature": "toast",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "alert",
+      "group": "Giao diện (app HBTouch)",
+      "signature": "alert",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "dialog",
+      "group": "Giao diện (app HBTouch)",
+      "signature": "dialog",
+      "status": "partial",
+      "description": "Foreground/optional overlay forms; some overlay control types use text fields.",
+      "example": "local form = {{type=\"INPUT\", title=\"Name\", value=\"\"}, {type=\"BUTTON\", title=\"OK\"}}\nprint(dialog(form), form[1].value)"
+    },
+    {
+      "name": "clearDialogValues",
+      "group": "Giao diện (app HBTouch)",
+      "signature": "clearDialogValues",
+      "status": "partial",
+      "description": "Dialog values are not persisted in this version.",
+      "example": ""
+    },
+    {
+      "name": "runScript",
+      "group": "Chạy / dừng script",
+      "signature": "runScript",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "stopScript",
+      "group": "Chạy / dừng script",
+      "signature": "stopScript",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "stopAllScripts",
+      "group": "Chạy / dừng script",
+      "signature": "stopAllScripts",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "runningScripts",
+      "group": "Chạy / dừng script",
+      "signature": "runningScripts",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "isScriptRunning",
+      "group": "Chạy / dừng script",
+      "signature": "isScriptRunning",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "http-control",
+      "group": "Chạy / dừng script",
+      "signature": "http-control",
+      "status": "partial",
+      "description": "Authenticated POST routes are documented; original unauthenticated GET routes are not exposed.",
+      "example": ""
+    },
+    {
+      "name": "setTimer",
+      "group": "Hẹn giờ / tự chạy",
+      "signature": "setTimer",
+      "status": "partial",
+      "description": "Persistent timers, up to128; four concurrent scripts and missed schedules can be rejected.",
+      "example": "setTimer(botPath(), os.time()+60, false, 0)"
+    },
+    {
+      "name": "removeTimer",
+      "group": "Hẹn giờ / tự chạy",
+      "signature": "removeTimer",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "setAutoLaunch",
+      "group": "Hẹn giờ / tự chạy",
+      "signature": "setAutoLaunch",
+      "status": "partial",
+      "description": "Daemon startup and SpringBoard startup notification; reboot/respring behavior pending hardware test.",
+      "example": ""
+    },
+    {
+      "name": "listAutoLaunch",
+      "group": "Hẹn giờ / tự chạy",
+      "signature": "listAutoLaunch",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "playAudio",
+      "group": "Âm thanh / ảnh",
+      "signature": "playAudio",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "stopAudio",
+      "group": "Âm thanh / ảnh",
+      "signature": "stopAudio",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "pauseAudio",
+      "group": "Âm thanh / ảnh",
+      "signature": "pauseAudio",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "resumeAudio",
+      "group": "Âm thanh / ảnh",
+      "signature": "resumeAudio",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "saveToSystemAlbum",
+      "group": "Âm thanh / ảnh",
+      "signature": "saveToSystemAlbum",
+      "status": "unsupported",
+      "description": "Photos permission/helper not implemented.",
+      "example": ""
+    },
+    {
+      "name": "clearSystemAlbum",
+      "group": "Âm thanh / ảnh",
+      "signature": "clearSystemAlbum",
+      "status": "unsupported",
+      "description": "Photos deletion helper not implemented.",
+      "example": ""
+    },
+    {
+      "name": "millis",
+      "group": "Log / script / tiện ích",
+      "signature": "millis",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "log",
+      "group": "Log / script / tiện ích",
+      "signature": "log",
+      "status": "partial",
+      "description": "Bounded polling logs, no SSE or hardware-volume stop shortcut.",
+      "example": ""
+    },
+    {
+      "name": "clearLog",
+      "group": "Log / script / tiện ích",
+      "signature": "clearLog",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "stop",
+      "group": "Log / script / tiện ích",
+      "signature": "stop",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "rootDir",
+      "group": "Log / script / tiện ích",
+      "signature": "rootDir",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "currentDir",
+      "group": "Log / script / tiện ích",
+      "signature": "currentDir",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "botPath",
+      "group": "Log / script / tiện ích",
+      "signature": "botPath",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "intToRgb",
+      "group": "Log / script / tiện ích",
+      "signature": "intToRgb",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "rgbToInt",
+      "group": "Log / script / tiện ích",
+      "signature": "rgbToInt",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "centerOffsetOfPoints",
+      "group": "Log / script / tiện ích",
+      "signature": "centerOffsetOfPoints",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "centerOffsetOfPixels",
+      "group": "Log / script / tiện ích",
+      "signature": "centerOffsetOfPixels",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "table.tostring",
+      "group": "Log / script / tiện ích",
+      "signature": "table.tostring",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "string.startswith",
+      "group": "Log / script / tiện ích",
+      "signature": "string.startswith",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "airplaneMode",
+      "group": "Sóng / kết nối",
+      "signature": "airplaneMode",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "wifi",
+      "group": "Sóng / kết nối",
+      "signature": "wifi",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "cellularData",
+      "group": "Sóng / kết nối",
+      "signature": "cellularData",
+      "status": "unsupported",
+      "description": "The platform cellular toggle is unavailable.",
+      "example": ""
+    },
+    {
+      "name": "getRadios",
+      "group": "Sóng / kết nối",
+      "signature": "getRadios",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "★ QUAN TRỌNG",
+      "group": "Cookie Safari",
+      "signature": "★ QUAN TRỌNG",
+      "status": "reference note",
+      "description": "Use only accounts and data owned by the device operator.",
+      "example": ""
+    },
+    {
+      "name": "getCookies",
+      "group": "Cookie Safari",
+      "signature": "getCookies",
+      "status": "partial",
+      "description": "Offline closed-Safari cookie file only; live/WebKit session cookies are unsupported.",
+      "example": ""
+    },
+    {
+      "name": "getCookieHeader",
+      "group": "Cookie Safari",
+      "signature": "getCookieHeader",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "getCookiesText",
+      "group": "Cookie Safari",
+      "signature": "getCookiesText",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "safariCookiesPath",
+      "group": "Cookie Safari",
+      "signature": "safariCookiesPath",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "getCookiesJSON",
+      "group": "Cookie Safari",
+      "signature": "getCookiesJSON",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "importCookies",
+      "group": "Cookie Safari",
+      "signature": "importCookies",
+      "status": "partial",
+      "description": "Offline selected-domain writes require confirmDomain; no live Safari injection.",
+      "example": ""
+    },
+    {
+      "name": "deleteCookies",
+      "group": "Cookie Safari",
+      "signature": "deleteCookies",
+      "status": "partial",
+      "description": "Offline selected-domain writes require confirmDomain; no live Safari injection.",
+      "example": ""
+    },
+    {
+      "name": "restoreCookies",
+      "group": "Cookie Safari",
+      "signature": "restoreCookies",
+      "status": "partial",
+      "description": "Offline selected-domain restoration only.",
+      "example": ""
+    },
+    {
+      "name": "auto-exit",
+      "group": "Safe Mode",
+      "signature": "auto-exit",
+      "status": "unsupported",
+      "description": "No automatic safe-mode changes.",
+      "example": ""
+    },
+    {
+      "name": "isSafeMode",
+      "group": "Safe Mode",
+      "signature": "isSafeMode",
+      "status": "unsupported",
+      "description": "No verified safe-mode detection.",
+      "example": ""
+    },
+    {
+      "name": "exitSafeMode",
+      "group": "Safe Mode",
+      "signature": "exitSafeMode",
+      "status": "unsupported",
+      "description": "No automatic safe-mode changes.",
+      "example": ""
+    },
+    {
+      "name": "setAutoExitSafeMode",
+      "group": "Safe Mode",
+      "signature": "setAutoExitSafeMode",
+      "status": "unsupported",
+      "description": "No automatic safe-mode changes.",
+      "example": ""
+    },
+    {
+      "name": "backupApp",
+      "group": "Backup / Restore",
+      "signature": "backupApp",
+      "status": "partial",
+      "description": "Stopped third-party app data only; excludes keychain, shared groups and app binary.",
+      "example": ""
+    },
+    {
+      "name": "restoreApp",
+      "group": "Backup / Restore",
+      "signature": "restoreApp",
+      "status": "partial",
+      "description": "App data only; recovery backup and explicit selected bundle. No keychain restore.",
+      "example": ""
+    },
+    {
+      "name": "wipeApp",
+      "group": "Backup / Restore",
+      "signature": "wipeApp",
+      "status": "partial",
+      "description": "Selected stopped app data only; recovery backup. No keychain wipe.",
+      "example": ""
+    },
+    {
+      "name": "deleteBackup",
+      "group": "Backup / Restore",
+      "signature": "deleteBackup",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "listBackups",
+      "group": "Backup / Restore",
+      "signature": "listBackups",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "listInstalledApps",
+      "group": "Backup / Restore",
+      "signature": "listInstalledApps",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "readFile",
+      "group": "File / JSON / Base64",
+      "signature": "readFile",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "writeFile",
+      "group": "File / JSON / Base64",
+      "signature": "writeFile",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "appendFile",
+      "group": "File / JSON / Base64",
+      "signature": "appendFile",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "removeFirstLine",
+      "group": "File / JSON / Base64",
+      "signature": "removeFirstLine",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "readLines",
+      "group": "File / JSON / Base64",
+      "signature": "readLines",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "fileExists",
+      "group": "File / JSON / Base64",
+      "signature": "fileExists",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "deleteFile",
+      "group": "File / JSON / Base64",
+      "signature": "deleteFile",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "listDir",
+      "group": "File / JSON / Base64",
+      "signature": "listDir",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "jsonEncode",
+      "group": "File / JSON / Base64",
+      "signature": "jsonEncode",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "jsonDecode",
+      "group": "File / JSON / Base64",
+      "signature": "jsonDecode",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "base64Encode",
+      "group": "File / JSON / Base64",
+      "signature": "base64Encode",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "base64Decode",
+      "group": "File / JSON / Base64",
+      "signature": "base64Decode",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "★ Kết quả trả về",
+      "group": "HTTP / API",
+      "signature": "★ Kết quả trả về",
+      "status": "reference note",
+      "description": "Use only accounts and data owned by the device operator.",
+      "example": ""
+    },
+    {
+      "name": "httpGet",
+      "group": "HTTP / API",
+      "signature": "httpGet",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": "local r = httpGet(\"https://example.com\", {timeout=10})\nprint(r.status)"
+    },
+    {
+      "name": "httpPost",
+      "group": "HTTP / API",
+      "signature": "httpPost",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "httpRequest",
+      "group": "HTTP / API",
+      "signature": "httpRequest",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "setProxy",
+      "group": "Proxy Wi-Fi",
+      "signature": "setProxy",
+      "status": "partial",
+      "description": "Manual unauthenticated Wi-Fi HTTP/HTTPS proxy; OS permission may deny changes.",
+      "example": ""
+    },
+    {
+      "name": "clearProxy",
+      "group": "Proxy Wi-Fi",
+      "signature": "clearProxy",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "getProxy",
+      "group": "Proxy Wi-Fi",
+      "signature": "getProxy",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "fakeLocation",
+      "group": "Vị trí GPS",
+      "signature": "fakeLocation",
+      "status": "unsupported",
+      "description": "System location simulation helper not implemented.",
+      "example": ""
+    },
+    {
+      "name": "clearLocation",
+      "group": "Vị trí GPS",
+      "signature": "clearLocation",
+      "status": "unsupported",
+      "description": "System location simulation helper not implemented.",
+      "example": ""
+    },
+    {
+      "name": "fakeLocationByIP",
+      "group": "Vị trí GPS",
+      "signature": "fakeLocationByIP",
+      "status": "unsupported",
+      "description": "No external location provider configured.",
+      "example": ""
+    },
+    {
+      "name": "KEY_TYPE",
+      "group": "Hằng số",
+      "signature": "KEY_TYPE",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "CONTROLLER_TYPE",
+      "group": "Hằng số",
+      "signature": "CONTROLLER_TYPE",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    },
+    {
+      "name": "ORIENTATION_TYPE",
+      "group": "Hằng số",
+      "signature": "ORIENTATION_TYPE",
+      "status": "implemented; hardware validation pending",
+      "description": "Original implementation. Availability depends on this iOS build and native permissions.",
+      "example": ""
+    }
+  ]
+}

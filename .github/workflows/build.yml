@@ -35,6 +35,8 @@ jobs:
           THEOS: ${{ runner.temp }}/theos
         run: |
           python3 scripts/fetch_lua.py
+          python3 scripts/fetch_tessdata.py
+          python3 scripts/api_index.py
           python3 tests/test_apt_repo.py
           node --check web/app.js
           mkdir -p "$RUNNER_TEMP/lua-objects"
@@ -43,8 +45,13 @@ jobs:
             [ "$(basename "$source")" = luac.c ] && continue
             xcrun clang -c -DLUA_USE_IOS -Ivendor/lua/src "$source" -o "$RUNNER_TEMP/lua-objects/$(basename "$source" .c).o"
           done
-          xcrun clang -fobjc-arc -fblocks -DHP_HOST_TEST -Idaemon -Ivendor/lua/src -framework Foundation daemon/main.m tests/BridgeStub.m "$RUNNER_TEMP"/lua-objects/*.o -o "$RUNNER_TEMP/hphone-host-test"
-          python3 tests/test_daemon.py "$RUNNER_TEMP/hphone-host-test"
+          xcrun clang -O2 -std=c11 -Wall -Wextra -Werror -Idaemon daemon/ScreenAlgorithms.c tests/test_screen_algorithms.c -lm -o "$RUNNER_TEMP/screen-test"
+          "$RUNNER_TEMP/screen-test"
+          xcrun clang -fobjc-arc -fblocks -DHP_HOST_TEST -Idaemon -Ivendor/lua/src -framework Foundation daemon/Server.m daemon/Runtime.m daemon/LuaBindings.m daemon/Services.m tests/BridgeStub.m "$RUNNER_TEMP"/lua-objects/*.o -o "$RUNNER_TEMP/hphone-host-test"
+          python3 tests/test_daemon_v2.py "$RUNNER_TEMP/hphone-host-test"
+          xcrun clang -fobjc-arc -fblocks -DHP_HOST_TEST -Idaemon -framework Foundation daemon/Services.m tests/ServicesDriver.m -o "$RUNNER_TEMP/services-test"
+          python3 tests/test_services.py "$RUNNER_TEMP/services-test"
+          python3 -m unittest discover -s tests -p 'test_fleet.py'
           gmake package FINALPACKAGE=1 -j2
       - name: Validate native payload and generate repository
         run: python3 scripts/apt_repo.py packages repo-out
