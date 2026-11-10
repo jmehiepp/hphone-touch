@@ -103,7 +103,7 @@ NSDictionary *HPCapabilities(void) {
         @"screenLastCheck":diagnostics,@"ocrMode":@"fast-cpu",@"deviceValidation":@"required",@"version":@"0.1.8"};
 }
 NSData *HPScreenshot(void) {
-    NSData *png=HPScreenshot(); if(!png)return nil;
+    CGImageRef image=capture(); if(!image) return nil;
     NSMutableData *data=[NSMutableData data]; CGImageDestinationRef dst=CGImageDestinationCreateWithData((__bridge CFMutableDataRef)data,CFSTR("public.png"),1,NULL);
     if(!dst) {CGImageRelease(image);return nil;} CGImageDestinationAddImage(dst,image,NULL);
     BOOL ok=CGImageDestinationFinalize(dst); CFRelease(dst); CGImageRelease(image); return ok?data:nil;
@@ -112,7 +112,7 @@ NSArray *HPOCR(void) {
     setup();if(![ocrLock tryLock])return nil;
     @try {
     traceStage("OCR capture\n");
-    CGImageRef image=capture(); if(!image) return nil;
+    NSData *png=HPScreenshot(); if(!png)return nil;
     traceStage("OCR request init\n");
     VNRecognizeTextRequest *request=[VNRecognizeTextRequest new]; request.recognitionLevel=VNRequestTextRecognitionLevelFast;
     request.usesCPUOnly=YES;
