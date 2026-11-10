@@ -22,6 +22,7 @@ static int (*mainDisplay)(HPIOMFBRef *);
 static int (*surfaceForLayer)(HPIOMFBRef,int,IOSurfaceRef *);
 static HPIOMFBRef displayConnection;
 static NSObject *captureLock;
+static NSDictionary *screenDiagnostics;
 static void setup(void) {
     static dispatch_once_t once; dispatch_once(&once,^{
         captureLock=[NSObject new];
@@ -40,10 +41,12 @@ static void setup(void) {
 static CGImageRef capture(void) {
     setup(); if(!mainDisplay||!surfaceForLayer) return NULL;
     @synchronized(captureLock) {
-    if(!displayConnection&&mainDisplay(&displayConnection))return NULL;
+    if(!displayConnection){int code=mainDisplay(&displayConnection);if(code||!displayConnection){screenDiagnostics=@{@"stage":@"mainDisplay",@"code":@(code)};return NULL;}}
     IOSurfaceRef s=NULL;
-    if(!displayConnection||surfaceForLayer(displayConnection,0,&s)||!s) return NULL;
-    if(IOSurfaceLock(s,kIOSurfaceLockReadOnly,NULL)!=0)return NULL;
+    int code=surfaceForLayer(displayConnection,0,&s);
+    if(code||!s){screenDiagnostics=@{@"stage":@"displaySurface",@"code":@(code),@"hasSurface":@(s!=NULL)};return NULL;}
+    code=IOSurfaceLock(s,kIOSurfaceLockReadOnly,NULL);
+    if(code){screenDiagnostics=@{@"stage":@"lockSurface",@"code":@(code)};return NULL;}
     size_t w=IOSurfaceGetWidth(s),h=IOSurfaceGetHeight(s),row=IOSurfaceGetBytesPerRow(s);
     CGImageRef image=NULL;
     if(w&&h&&w<16384&&h<16384&&row>=w*4&&row<128*1024*1024/h&&IOSurfaceGetBaseAddress(s)) {
@@ -53,13 +56,15 @@ static CGImageRef capture(void) {
         image=CGImageCreate(w,h,8,32,row,color,kCGBitmapByteOrder32Little|kCGImageAlphaPremultipliedFirst,provider,NULL,false,kCGRenderingIntentDefault);
         CGColorSpaceRelease(color); CGDataProviderRelease(provider); CFRelease(bytes);
     }
+    screenDiagnostics=@{@"stage":image?@"ok":@"pixelFormat",@"width":@(w),@"height":@(h),@"row":@(row)};
     IOSurfaceUnlock(s,kIOSurfaceLockReadOnly,NULL); return image;
     }
 }
 NSDictionary *HPCapabilities(void) {
+    NSDictionary *diagnostics;setup();@synchronized(captureLock){diagnostics=screenDiagnostics?:@{@"stage":@"notTried"};}
     setup(); return @{@"lua":@YES,@"scripts":@YES,@"screenBridgePresent":@(mainDisplay&&surfaceForLayer),
         @"touchBridgePresent":@(client&&digitizer&&finger&&appendEvent&&dispatchEvent),@"keyBridgePresent":@(client&&keyboard&&dispatchEvent),
-        @"deviceValidation":@"required",@"version":@"0.1.1"};
+        @"screenLastCheck":diagnostics,@"deviceValidation":@"required",@"version":@"0.1.2"};
 }
 NSData *HPScreenshot(void) {
     CGImageRef image=capture(); if(!image) return nil;

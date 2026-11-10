@@ -137,5 +137,5 @@ int main(void){@autoreleasepool {
     chmod(portPath.fileSystemRepresentation,0600);
     // Four workers keep stop/status available while an OCR request is executing.
     for(int i=0;i<4;i++)dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED,0),^{for(;;){int fd=accept(server,NULL,NULL);if(fd>=0){serve(fd);close(fd);}}});
-    logLine(@"HPhone Touch 0.1.1 ready; native bridges require device testing");dispatch_main();return 0;
+    logLine(@"HPhone Touch 0.1.2 ready; native bridges require device testing");dispatch_main();return 0;
 }}
