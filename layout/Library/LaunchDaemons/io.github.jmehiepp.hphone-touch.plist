@@ -8,6 +8,5 @@
 <key>KeepAlive</key><true/>
 <key>ThrottleInterval</key><integer>10</integer>
 <key>ProcessType</key><string>Interactive</string>
-<key>JetsamProperties</key><dict><key>JetsamMemoryLimit</key><integer>256</integer></dict>
 <key>EnvironmentVariables</key><dict><key>HOME</key><string>/var/mobile</string></dict>
 </dict></plist>

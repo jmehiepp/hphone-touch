@@ -87,7 +87,7 @@ NSDictionary *HPCapabilities(void) {
     NSDictionary *diagnostics;setup();@synchronized(captureLock){diagnostics=screenDiagnostics?:@{@"stage":@"notTried"};}
     setup(); return @{@"lua":@YES,@"scripts":@YES,@"screenBridgePresent":@(mainDisplay&&surfaceForLayer),
         @"touchBridgePresent":@(client&&digitizer&&finger&&appendEvent&&dispatchEvent),@"keyBridgePresent":@(client&&keyboard&&dispatchEvent),
-        @"screenLastCheck":diagnostics,@"deviceValidation":@"required",@"version":@"0.1.4"};
+        @"screenLastCheck":diagnostics,@"deviceValidation":@"required",@"version":@"0.1.5"};
 }
 NSData *HPScreenshot(void) {
     CGImageRef image=capture(); if(!image) return nil;

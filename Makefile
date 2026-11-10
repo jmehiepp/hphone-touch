@@ -9,7 +9,7 @@ hphone-touchd_CFLAGS = -Ivendor/lua/src -Idaemon -DLUA_USE_IOS -Wno-deprecated-d
 hphone-touchd_OBJCFLAGS = -fobjc-arc
 hphone-touchd_LDFLAGS = -lroothide
 hphone-touchd_FRAMEWORKS = Foundation UIKit CoreGraphics IOSurface Vision ImageIO IOKit
-hphone-touchd_CODESIGN_FLAGS = -Sentitlements.plist
+hphone-touchd_CODESIGN_FLAGS = -Sdaemon/entitlements.plist
 hphone-touchd_INSTALL_PATH = /usr/bin
 include $(THEOS_MAKE_PATH)/tool.mk
 APPLICATION_NAME = HPhoneTouch

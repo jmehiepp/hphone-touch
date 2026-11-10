@@ -24,6 +24,16 @@ static NSMutableArray *logs;
 static BOOL running;
 static atomic_bool cancelled;
 static NSUInteger sequence;
+static NSDictionary *memoryBudget;
+#ifndef HP_HOST_TEST
+extern int memorystatus_control(uint32_t command,int32_t pid,uint32_t flags,void *buffer,size_t buffersize);
+static void configureMemoryBudget(void) {
+    struct {int32_t active;uint32_t activeAttr;int32_t inactive;uint32_t inactiveAttr;} limits={256,1,256,1};
+    errno=0;int result=memorystatus_control(7,getpid(),0,&limits,sizeof(limits));int error=errno;
+    if(!result)memorystatus_control(8,getpid(),0,&limits,sizeof(limits));
+    memoryBudget=@{@"setResult":@(result),@"errno":@(error),@"activeMB":@(limits.active),@"inactiveMB":@(limits.inactive)};
+}
+#endif
 static void *limitedAlloc(void *ud,void *ptr,size_t oldSize,size_t newSize) {
     size_t *used=ud,previous=ptr?oldSize:0;
     if(!newSize){free(ptr);*used-=previous;return NULL;}
@@ -91,7 +101,7 @@ static void serve(int fd) { @autoreleasepool {
     while(raw.length<start+needed){ssize_t n=recv(fd,buffer,MIN(sizeof(buffer),start+needed-raw.length),0);if(n<=0)return;[raw appendBytes:buffer length:n];}
     BOOL api=[path hasPrefix:@"/api/"];if(api&&![headers[@"x-hphone-token"] isEqualToString:token]){answer(fd,401,@{@"error":@"Token required"});return;}
     NSDictionary *body=@{};if([method isEqual:@"POST"]){id obj=[NSJSONSerialization JSONObjectWithData:[raw subdataWithRange:NSMakeRange(start,needed)] options:0 error:NULL];if(![obj isKindOfClass:NSDictionary.class]){answer(fd,400,@{@"error":@"JSON object required"});return;}body=obj;}
-    if([method isEqual:@"GET"]&&[path isEqual:@"/api/status"]){[lock lock];NSDictionary *v=@{@"running":@(running),@"logs":[logs copy],@"capabilities":HPCapabilities()};[lock unlock];answer(fd,200,v);return;}
+    if([method isEqual:@"GET"]&&[path isEqual:@"/api/status"]){[lock lock];NSDictionary *v=@{@"running":@(running),@"logs":[logs copy],@"capabilities":HPCapabilities(),@"memoryBudget":memoryBudget?:@{}};[lock unlock];answer(fd,200,v);return;}
     if([method isEqual:@"GET"]&&[path isEqual:@"/api/files"]){NSMutableArray *files=[NSMutableArray array];for(NSString *n in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:scripts error:NULL])if(scriptPath(n))[files addObject:n];answer(fd,200,@{@"files":[files sortedArrayUsingSelector:@selector(compare:)]});return;}
     if([method isEqual:@"GET"]&&[path isEqual:@"/api/screen"]){NSData *data=HPScreenshot();if(data)reply(fd,200,@"image/png",data);else answer(fd,503,@{@"error":@"Screen bridge unavailable"});return;}
     if([method isEqual:@"POST"]&&[path isEqual:@"/api/ocr"]){NSArray *items=HPOCR();answer(fd,items?200:503,items?@{@"items":items}:@{@"error":@"OCR unavailable"});return;}
@@ -114,6 +124,9 @@ int main(void){@autoreleasepool {
     if(!base.length)return 4;
 #endif
     lock=[NSLock new];logs=[NSMutableArray new];scripts=[base stringByAppendingPathComponent:@"scripts"];
+#ifndef HP_HOST_TEST
+    configureMemoryBudget();
+#endif
     NSFileManager *fm=NSFileManager.defaultManager;NSError *error=nil;
     if(![fm createDirectoryAtPath:scripts withIntermediateDirectories:YES attributes:@{NSFilePosixPermissions:@0700} error:&error])return 1;
     chmod(base.fileSystemRepresentation,0700);chmod(scripts.fileSystemRepresentation,0700);
@@ -137,5 +150,5 @@ int main(void){@autoreleasepool {
     chmod(portPath.fileSystemRepresentation,0600);
     // Four workers keep stop/status available while an OCR request is executing.
     for(int i=0;i<4;i++)dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED,0),^{for(;;){int fd=accept(server,NULL,NULL);if(fd>=0){serve(fd);close(fd);}}});
-    logLine(@"HPhone Touch 0.1.4 ready; native bridges require device testing");dispatch_main();return 0;
+    logLine(@"HPhone Touch 0.1.5 ready; native bridges require device testing");dispatch_main();return 0;
 }}
