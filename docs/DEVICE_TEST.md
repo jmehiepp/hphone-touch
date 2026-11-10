@@ -1,21 +1,28 @@
-# Biên bản kiểm tra thiết bị 0.1.0
+# Kiểm tra HPhone Touch 0.1.10 trên thiết bị
 
-Trạng thái hiện tại: **chưa thử runtime**. Không được đổi thành PASS chỉ dựa vào CI hoặc symbol có trong hệ thống.
+Ngày 10/11/2026. Máy thử: iPhone 6s (iPhone8,1), iOS 15.8.4, Dopamine RootHide 3.0.13-30. Chỉ xác nhận máy thử này; không suy ra mọi thiết bị đều tương thích.
 
-| Ca kiểm | Kỳ vọng | Kết quả |
-| --- | --- | --- |
-| Cài qua Sileo | Không báo lỗi dpkg, có icon | Chưa chạy |
-| Mở app | Giao diện hiện, trạng thái sẵn sàng | Chưa chạy |
-| hello.lua | Log ba bước và Finished | Chưa chạy |
-| Vòng lặp vô hạn → Dừng | Thoát script, daemon còn sống | Chưa chạy |
-| Lưu/đọc/xóa script | Nội dung khớp UTF-8 | Chưa chạy |
-| Chụp màn hình | PNG đúng nội dung, màu, kích thước | Chưa chạy |
-| Chạm ảnh màn hình | App đích nhận đúng vị trí | Chưa chạy |
-| Home, Power, Volume | Phím tác động đúng | Chưa chạy |
-| OCR | Nội dung chữ và bounding box hợp lý | Chưa chạy |
-| Reboot + jailbreak lại | App/daemon vẫn hoạt động | Chưa chạy |
-| Gỡ/cài lại | Giữ nguyên script/token | Chưa chạy |
-| API không token | HTTP 401 | Chưa chạy |
-| Đường dẫn ../ / symlink | Từ chối, không ghi ngoài script | Chưa chạy |
+| Ca kiểm | Kết quả thực tế |
+| --- | --- |
+| Kho Sileo | Client tải index thành công; APT thấy candidate đúng tên gói |
+| Cài gói | Tải HTTPS, kiểm SHA256, cài qua USB/dpkg; trạng thái install ok installed |
+| App/icon | Icon có trên Home; mở app hiện Sẵn sàng |
+| hello.lua từ thao tác chạm | API chạm nút Lưu & chạy; log đủ Step 1, 2, 3 và Finished |
+| Chạy/dừng Lua | Script mẫu chạy; vòng lặp vô hạn dừng được; daemon còn hoạt động |
+| Đọc/lưu/xóa script | Đã kiểm trên thiết bị; file thử được xóa sau kiểm tra |
+| Chụp màn hình | PNG 750×1334, nội dung và màu đối chiếu đúng màn hình thật |
+| Chạm | Đã xác nhận tác động vào nút chạy trong UI, có log thực thi tương ứng |
+| Home | Đã quan sát chuyển từ app về màn hình Home |
+| OCR | HTTP 200, 16 khối chữ từ UI app; có text, confidence và bounding box; PID daemon không đổi |
+| Bộ nhớ | API kernel trả thành công; đọc lại active/inactive limit đều 256 MiB cho chính PID daemon |
+| API thiếu token | HTTP 401 trên thiết bị |
+| Xung đột cổng | Cổng 8765 đang bận; daemon chọn cổng khác, app đọc cổng tự động |
+| Power/âm lượng | Chưa thử |
+| Reboot rồi jailbreak lại | Chưa thử |
+| Gỡ/cài lại | Chưa thử; nâng cấp 0.1.x giữ hello.lua và token |
+| Path traversal/symlink | Qua host test chạy daemon thật với bridge stub; chưa thử lại trên iPhone |
+| 35 máy/chạy dài hạn | Chưa thử |
 
-Ghi kèm model/iOS, phiên bản RootHide, phiên bản gói, ngày, ảnh/log lỗi. Không đưa token, mật khẩu, UDID hoặc dữ liệu cá nhân vào issue công khai.
+CI có 9 kiểm tra (4 package/APT, 5 nhóm HTTP/Lua daemon). Host test dùng bridge stub, không thay thế kiểm phần cứng. Build/test/deploy: https://github.com/jmehiepp/hphone-touch/actions/runs/42780541408
+
+OCR Fast phụ thuộc ngôn ngữ Vision trên iOS 15; không đảm bảo nhận đầy đủ dấu tiếng Việt hoặc chữ nhỏ. Ảnh, log, UDID, mật khẩu và token của máy thử giữ cục bộ, không đưa vào repo công khai.

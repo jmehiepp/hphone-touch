@@ -1,19 +1,19 @@
 # HPhone Touch
 
-Công cụ tự động hóa Lua độc lập cho iPhone dùng Dopamine RootHide. Mục tiêu đầu tiên: iPhone 6s (ARM64), iOS 15.x. **0.1.10 là bản thử nghiệm, đang kiểm tra trên thiết bị. Không tuyên bố tương đương đầy đủ HBTouch.**
+Công cụ tự động hóa Lua độc lập cho iPhone dùng Dopamine RootHide. **0.1.10 đã qua kiểm tra các chức năng cốt lõi trên iPhone 6s, iOS 15.8.4, RootHide 3.0.13-30.** Đây vẫn là bản thử nghiệm; chưa kiểm tra sau reboot/jailbreak lại hoặc trên cả dàn máy, chưa tương đương đầy đủ HBTouch.
 
-Kho Sileo dự kiến: `https://jmehiepp.github.io/hphone-touch/`. Chỉ có gói sau khi GitHub Actions build và kiểm tra thành công. Đây là kho APT riêng, Sileo là ứng dụng đọc kho. Release hiện chưa ký GPG.
+Kho Sileo đang hoạt động: `https://jmehiepp.github.io/hphone-touch/`. GitHub Actions chỉ xuất bản sau khi build và kiểm tra thành công. Đây là kho APT riêng, Sileo là ứng dụng đọc kho. Release hiện chưa ký GPG; khi cài bằng CLI trên máy thử, gói được tải qua HTTPS, kiểm SHA256 rồi cài bằng dpkg.
 
 ## Chức năng
 
 | Phần | Bản 0.1 |
 | --- | --- |
-| App iPhone và giao diện web thích ứng | Có mã nguồn |
-| Danh sách, đọc, lưu, xóa script `.lua` | Có mã nguồn |
-| Lua 5.4.9, log, chạy một script, dừng hợp tác | Có mã nguồn |
-| Chạm pixel, Home/Power/âm lượng | Cầu IOHID; cần thử thiết bị |
-| Chụp màn hình PNG | Cầu IOMobileFramebuffer; cần thử thiết bị |
-| OCR | Apple Vision từ ảnh màn hình; cần thử thiết bị |
+| App iPhone và giao diện web thích ứng | Đã mở và quan sát trên máy thử |
+| Danh sách, đọc, lưu, xóa script `.lua` | Đã thử trên máy |
+| Lua 5.4.9, log, chạy một script, dừng hợp tác | Đã thử chạy và dừng vòng lặp trên máy |
+| Chạm pixel, Home/Power/âm lượng | Đã xác nhận chạm nút chạy và Home; chưa thử Power/âm lượng |
+| Chụp màn hình PNG | Đã đối chiếu ảnh 750×1334 với màn hình thật |
+| OCR | Vision Fast/CPU qua CVPixelBuffer; đã trả 16 khối chữ trên UI app, daemon giữ nguyên PID |
 | Swipe, tìm ảnh/màu, bật app, nhập chữ, overlay | Chưa có |
 | Cookie, keychain, wipe, backup/restore app | Chưa có |
 | Điều phối 35 máy và 169 API tài liệu bản gốc | Chưa có |
@@ -28,7 +28,7 @@ Không dùng binary, tài nguyên, máy chủ cấp phép hoặc thương hiệu
 4. Chụp màn hình; đối chiếu ảnh với máy. Kiểm tra một chạm ở màn hình chính và Home; xác nhận bằng mắt. Thử OCR với chữ rõ trên màn hình.
 5. Gỡ/cài lại gói, kiểm tra script vẫn giữ. Khởi động lại và jailbreak lại, xác nhận daemon/app hoạt động với jbroot mới.
 
-Chỉ triển khai nhiều máy sau khi hoàn tất các bước này trên máy thử. Báo kết quả theo `docs/DEVICE_TEST.md`.
+Kết quả thực tế và các ca còn chưa chạy nằm trong [biên bản thiết bị](docs/DEVICE_TEST.md). Hoàn tất các ca còn lại trước khi triển khai nhiều máy.
 
 ## Lua API
 
