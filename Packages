@@ -1,0 +1,18 @@
+Package: io.github.jmehiepp.hphone-touch
+Name: HPhone Touch
+Description: Lua automation, visual matching, scripts, owner-managed data tools and USB fleet control. Experimental.
+Maintainer: jmehiepp
+Author: HPhone Touch contributors
+Section: Utilities
+Depends: firmware (>= 15.0), libtesseract5
+Conflicts: io.github.jmehiepp.hphone-touch-rootless
+Homepage: https://github.com/jmehiepp/hphone-touch
+Architecture: iphoneos-arm64e
+Version: 0.2.1
+Installed-Size: 5348
+Filename: pool/io.github.jmehiepp.hphone-touch_0.2.1_iphoneos-arm64e.deb
+Size: 2203998
+MD5sum: e79ba533328e480b0de67b1f5c37757f
+SHA256: 2a340f7970acf5853d1607e667dcda49f5916bfe089ef0cd762522cbf8a3a91d
+SHA512: fbea0067cbb473837b25a4500026dffa3f1500f601f18992d8510becae98dd74b39c4f64e414f6f049aea7fde4c1cf2ba657e0e90e18c51442e358cf7bad1dc0
+
