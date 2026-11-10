@@ -7,10 +7,12 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <mach/mach_time.h>
+#include <math.h>
 extern char **environ;
 
 static NSString *const directory = @"/var/mobile/Media/RootHideFleet";
-static NSString *const officialHelperSHA = @"f0915cb7a608522ef84a43c6617433037e030ff68f5db89a6bb982f8430a0cb9";
+static NSString *const officialHelperSHA = @"3634607f8165fb41c6844cb0b7608f38ee1f51c2e96e353ed13d4c76a28aa1bd";
 static NSString *const developmentIPASHA = @"22b48e78111d2885c621c36fb4bac6c042fed7ea50de84b0f842943129742d65";
 
 static BOOL verify(NSString *path, NSString *sha) {
@@ -44,16 +46,57 @@ static int rootCommand(NSString *helper, NSString *command, NSString *argument) 
     return WIFEXITED(status) ? WEXITSTATUS(status) : -102;
 }
 
+// Single bounded HID events, derived from HPhone Touch's published bridge.
+// PC automation observes the foreground screen before requesting an event.
+static int inputEvent(NSString *action) {
+    void *io = dlopen("/System/Library/Frameworks/IOKit.framework/IOKit", RTLD_LAZY);
+    if (!io) return -120;
+    void *(*create)(CFAllocatorRef) = dlsym(io,"IOHIDEventSystemClientCreate");
+    void (*send)(void *,CFTypeRef) = dlsym(io,"IOHIDEventSystemClientDispatchEvent");
+    if (!create || !send) return -121;
+    void *client = create(kCFAllocatorDefault); if (!client) return -122;
+    if ([action isEqualToString:@"tap-observed-element"]) {
+        const char *xs=getenv("HPHONE_FLEET_X"), *ys=getenv("HPHONE_FLEET_Y");
+        if (!xs || !ys) return -123;
+        double x=atof(xs),y=atof(ys); if (!isfinite(x)||!isfinite(y)||x<0||x>=1||y<0||y>=1) return -124;
+        CFTypeRef (*parentEvent)(CFAllocatorRef,uint64_t,uint32_t,uint32_t,uint32_t,uint32_t,uint32_t,double,double,double,double,double,Boolean,Boolean,uint32_t)=dlsym(io,"IOHIDEventCreateDigitizerEvent");
+        CFTypeRef (*fingerEvent)(CFAllocatorRef,uint64_t,uint32_t,uint32_t,uint32_t,double,double,double,double,double,Boolean,Boolean,uint32_t)=dlsym(io,"IOHIDEventCreateDigitizerFingerEvent");
+        void (*append)(CFTypeRef,CFTypeRef,uint32_t)=dlsym(io,"IOHIDEventAppendEvent");
+        void (*setInt)(CFTypeRef,uint32_t,int64_t)=dlsym(io,"IOHIDEventSetIntegerValue");
+        void (*sender)(CFTypeRef,uint64_t)=dlsym(io,"IOHIDEventSetSenderID");
+        if (!parentEvent||!fingerEvent||!append) return -125;
+        for (int phase=0;phase<2;phase++) {
+            Boolean down=phase==0;
+            CFTypeRef parent=parentEvent(NULL,mach_absolute_time(),3,1u<<22,1,down?0x23:0x27,0,x,y,0,0,0,false,false,0);
+            CFTypeRef finger=fingerEvent(NULL,mach_absolute_time(),3,2,3,x,y,0,0,0,down,down,0);
+            if (!parent||!finger) return -126;
+            if(setInt){setInt(parent,4,1);setInt(parent,0xb0019,1);}if(sender)sender(parent,UINT64_C(0x8000000817319372));
+            append(parent,finger,0);send(client,parent);CFRelease(finger);CFRelease(parent);usleep(80000);
+        }
+    } else {
+        const char *text=getenv("HPHONE_FLEET_TEXT"); if (!text||strlen(text)>128) return -127;
+        CFTypeRef (*key)(CFAllocatorRef,uint64_t,uint32_t,uint32_t,Boolean,uint32_t)=dlsym(io,"IOHIDEventCreateKeyboardEvent");
+        if (!key) return -128;
+        for (const char *c=text;*c;c++) {
+            unsigned usage=(*c>='a'&&*c<='z')?4+*c-'a':(*c>='1'&&*c<='9')?0x1e+*c-'1':*c=='0'?0x27:*c=='\t'?0x2b:0;
+            if (!usage) return -129;
+            for(int phase=0;phase<2;phase++){CFTypeRef event=key(NULL,mach_absolute_time(),7,usage,phase==0,0);if(!event)return -130;send(client,event);CFRelease(event);usleep(30000);}
+        }
+    }
+    CFRelease(client); return 0;
+}
+
 __attribute__((constructor)) static void fleetBootstrap(void) {
     @autoreleasepool {
         const char *requested = getenv("HPHONE_FLEET_ACTION");
         if (!requested) return;
         NSString *action = @(requested);
-        if (![@[@"install-pinned-roothide", @"install-pinned-trollstore", @"install-stock-persistence-helper"] containsObject:action]) return;
+        if (![@[@"install-pinned-roothide", @"install-pinned-trollstore", @"install-stock-persistence-helper", @"tap-observed-element", @"type-lowercase-ascii"] containsObject:action]) return;
         if (![NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.tips"] || getuid() != 501) return;
         // Delay work until the application run loop is alive; the visible helper stays available.
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC), dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-            NSString *helper = [directory stringByAppendingPathComponent:@"PersistenceHelper_Embedded"];
+        BOOL input=[action isEqualToString:@"tap-observed-element"]||[action isEqualToString:@"type-lowercase-ascii"];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (input?3:1)*NSEC_PER_SEC), dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+            NSString *helper = [directory stringByAppendingPathComponent:@"trollstorehelper"];
             NSString *ipa = [directory stringByAppendingPathComponent:@"Dopamine-roothide-3.0.13-30-USBDevelopment.tipa"];
             int result = -110;
             NSString *command = @"install";
@@ -68,7 +111,8 @@ __attribute__((constructor)) static void fleetBootstrap(void) {
                 command = @"install-persistence-helper";
                 argument = @"com.apple.tips";
             }
-            if (integrity && chmod(helper.fileSystemRepresentation, 0755) == 0) result = rootCommand(helper, command, argument);
+            if(input){integrity=YES;result=inputEvent(action);}
+            else if (integrity && chmod(helper.fileSystemRepresentation, 0755) == 0) result = rootCommand(helper, command, argument);
             NSDictionary *evidence = @{@"action":action, @"integrity_verified":@(integrity),
                                       @"exit_code":@(result), @"finished_at":@([[NSDate date] timeIntervalSince1970])};
             NSData *json = [NSJSONSerialization dataWithJSONObject:evidence options:NSJSONWritingPrettyPrinted error:nil];

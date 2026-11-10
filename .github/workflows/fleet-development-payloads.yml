@@ -33,6 +33,7 @@ jobs:
           shasum -a 256 fleet-native-output/FleetBootstrap.dylib > fleet-native-output/SHA256SUMS
           xcrun --sdk iphoneos clang -arch arm64 -miphoneos-version-min=15.0 -fobjc-arc -fblocks -framework Foundation -framework UIKit scripts/FleetBootstrap.m scripts/FleetBootstrapMain.m -o fleet-native-output/HPhoneFleetBootstrap
           python3 -c 'import plistlib; p="'"$RUNNER_TEMP"'/TrollStore/TrollHelper/entitlements.plist"; d=plistlib.load(open(p,"rb")); d["get-task-allow"]=True; d["task_for_pid-allow"]=True; plistlib.dump(d,open("fleet-native-output/entitlements.plist","wb"))'
+          python3 -c 'import plistlib; p="fleet-native-output/entitlements.plist"; d=plistlib.load(open(p,"rb")); d.update({"com.apple.private.hid.client.event-dispatch":True,"com.apple.hid.client.event-dispatch":True,"com.apple.private.hid.client.admin":True}); plistlib.dump(d,open(p,"wb"))'
           ldid -Sfleet-native-output/entitlements.plist fleet-native-output/HPhoneFleetBootstrap
           "$RUNNER_TEMP/TrollStore/Exploits/fastPathSign/fastPathSign" fleet-native-output/HPhoneFleetBootstrap
           cp scripts/FleetBootstrapMain.m fleet-native-output/
