@@ -78,7 +78,7 @@ static int inputEvent(NSString *action) {
         CFTypeRef (*key)(CFAllocatorRef,uint64_t,uint32_t,uint32_t,Boolean,uint32_t)=dlsym(io,"IOHIDEventCreateKeyboardEvent");
         if (!key) return -128;
         for (const char *c=text;*c;c++) {
-            unsigned usage=(*c>='a'&&*c<='z')?4+*c-'a':(*c>='1'&&*c<='9')?0x1e+*c-'1':*c=='0'?0x27:*c=='\t'?0x2b:0;
+            unsigned usage=(*c>='a'&&*c<='z') ? 4 + *c - 'a' : (*c>='1'&&*c<='9') ? 0x1e + *c - '1' : *c=='0' ? 0x27 : *c=='\t' ? 0x2b : 0;
             if (!usage) return -129;
             for(int phase=0;phase<2;phase++){CFTypeRef event=key(NULL,mach_absolute_time(),7,usage,phase==0,0);if(!event)return -130;send(client,event);CFRelease(event);usleep(30000);}
         }
