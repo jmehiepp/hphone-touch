@@ -1,5 +1,7 @@
 """Package-format fixtures test APT validation; fixtures are never shipped as binaries."""
 import gzip
+import bz2
+import lzma
 import hashlib
 import importlib.util
 import io
@@ -53,10 +55,23 @@ class AptTests(unittest.TestCase):
             apt.generate([package], base/"out")
             content = (base/"out/Packages").read_bytes()
             self.assertEqual(gzip.decompress((base/"out/Packages.gz").read_bytes()), content)
+            self.assertEqual(bz2.decompress((base/"out/Packages.bz2").read_bytes()), content)
+            self.assertEqual(lzma.decompress((base/"out/Packages.xz").read_bytes()), content)
             fields = apt.fields(content.decode())
             self.assertEqual(fields["SHA256"], hashlib.sha256(package.read_bytes()).hexdigest())
             self.assertEqual(fields["Size"], str(package.stat().st_size))
             self.assertIn(hashlib.sha256(content).hexdigest(), (base/"out/Release").read_text())
+            release = apt.fields((base/"out/Release").read_text())
+            # RootHide Sileo RepoManager._update rejects Release without these fields,
+            # including for flat repositories. Check the consumer's required fields.
+            for key in ("Architectures", "Components"):
+                self.assertTrue(release.get(key), f"RootHide Sileo requires {key}")
+            self.assertIn("iphoneos-arm64e", release["Architectures"].split())
+            for line in release["SHA256"].splitlines():
+                if line.strip():
+                    digest, size, name = line.split()
+                    blob = (base/"out"/name).read_bytes()
+                    self.assertEqual((hashlib.sha256(blob).hexdigest(), str(len(blob))), (digest, size))
 
     def test_rejects_arm64e_and_newer_minimum(self):
         for options in ({"cpu_subtype":2}, {"minimum":16<<16}):

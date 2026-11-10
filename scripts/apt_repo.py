@@ -1,10 +1,12 @@
 """Validate native .debs and generate a flat APT repository for Sileo."""
 from __future__ import annotations
 import argparse
+import bz2
 import email.utils
 import gzip
 import hashlib
 import io
+import lzma
 from pathlib import Path
 import plistlib
 import shutil
@@ -128,12 +130,14 @@ def generate(packages, dest):
     content = ("\n\n".join(entries)+"\n\n").encode()
     (dest/"Packages").write_bytes(content)
     (dest/"Packages.gz").write_bytes(gzip.compress(content, mtime=0))
+    (dest/"Packages.bz2").write_bytes(bz2.compress(content))
+    (dest/"Packages.xz").write_bytes(lzma.compress(content))
     release = ["Origin: HPhone Touch", "Label: HPhone Touch", "Suite: stable", "Codename: stable",
-               "Architectures: iphoneos-arm64e", "Description: HPhone Touch experimental RootHide packages",
+               "Architectures: iphoneos-arm64e", "Components: main", "Description: HPhone Touch experimental RootHide packages",
                "Date: "+email.utils.formatdate(usegmt=True)]
     for algorithm, title in (("md5", "MD5Sum"), ("sha256", "SHA256"), ("sha512", "SHA512")):
         release.append(title+":")
-        for name in ("Packages", "Packages.gz"):
+        for name in ("Packages", "Packages.gz", "Packages.bz2", "Packages.xz"):
             blob = (dest/name).read_bytes()
             release.append(f" {hashlib.new(algorithm, blob).hexdigest()} {len(blob)} {name}")
     (dest/"Release").write_text("\n".join(release)+"\n", encoding="utf-8", newline="\n")
