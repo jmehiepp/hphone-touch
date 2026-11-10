@@ -23,7 +23,7 @@ static BOOL verify(NSString *path, NSString *sha) {
     return [actual isEqualToString:sha];
 }
 
-static int rootInstall(NSString *helper, NSString *ipa) {
+static int rootCommand(NSString *helper, NSString *command, NSString *argument) {
     int (*persona)(posix_spawnattr_t *, uid_t, uint32_t) = dlsym(RTLD_DEFAULT, "posix_spawnattr_set_persona_np");
     int (*uid)(posix_spawnattr_t *, uid_t) = dlsym(RTLD_DEFAULT, "posix_spawnattr_set_persona_uid_np");
     int (*gid)(posix_spawnattr_t *, gid_t) = dlsym(RTLD_DEFAULT, "posix_spawnattr_set_persona_gid_np");
@@ -34,7 +34,7 @@ static int rootInstall(NSString *helper, NSString *ipa) {
     if ((result = persona(&attr, 99, 1)) || (result = uid(&attr, 0)) || (result = gid(&attr, 0))) {
         posix_spawnattr_destroy(&attr); return result;
     }
-    char *argv[] = {(char *)helper.fileSystemRepresentation, "install", (char *)ipa.fileSystemRepresentation, NULL};
+    char *argv[] = {(char *)helper.fileSystemRepresentation, (char *)command.UTF8String, (char *)argument.fileSystemRepresentation, NULL};
     pid_t child;
     result = posix_spawn(&child, argv[0], NULL, &attr, argv, environ);
     posix_spawnattr_destroy(&attr);
@@ -47,16 +47,29 @@ static int rootInstall(NSString *helper, NSString *ipa) {
 __attribute__((constructor)) static void fleetBootstrap(void) {
     @autoreleasepool {
         const char *requested = getenv("HPHONE_FLEET_ACTION");
-        if (!requested || strcmp(requested, "install-pinned-roothide")) return;
+        if (!requested) return;
+        NSString *action = @(requested);
+        if (![@[@"install-pinned-roothide", @"install-pinned-trollstore", @"install-stock-persistence-helper"] containsObject:action]) return;
         if (![NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.tips"] || getuid() != 501) return;
         // Delay work until the application run loop is alive; the visible helper stays available.
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC), dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
             NSString *helper = [directory stringByAppendingPathComponent:@"PersistenceHelper_Embedded"];
             NSString *ipa = [directory stringByAppendingPathComponent:@"Dopamine-roothide-3.0.13-30-USBDevelopment.tipa"];
             int result = -110;
-            BOOL integrity = verify(helper, officialHelperSHA) && verify(ipa, developmentIPASHA);
-            if (integrity && chmod(helper.fileSystemRepresentation, 0755) == 0) result = rootInstall(helper, ipa);
-            NSDictionary *evidence = @{@"action":@"install-pinned-roothide", @"integrity_verified":@(integrity),
+            NSString *command = @"install";
+            NSString *argument = ipa;
+            BOOL integrity = verify(helper, officialHelperSHA);
+            if ([action isEqualToString:@"install-pinned-roothide"]) integrity &= verify(ipa, developmentIPASHA);
+            else if ([action isEqualToString:@"install-pinned-trollstore"]) {
+                command = @"install-trollstore";
+                argument = [directory stringByAppendingPathComponent:@"TrollStore-2.1.1.tar"];
+                integrity &= verify(argument, @"144dc741d1b74d582c861e6ed504ddced3745724e216e3de79ab7d37b27d0551");
+            } else {
+                command = @"install-persistence-helper";
+                argument = @"com.apple.tips";
+            }
+            if (integrity && chmod(helper.fileSystemRepresentation, 0755) == 0) result = rootCommand(helper, command, argument);
+            NSDictionary *evidence = @{@"action":action, @"integrity_verified":@(integrity),
                                       @"exit_code":@(result), @"finished_at":@([[NSDate date] timeIntervalSince1970])};
             NSData *json = [NSJSONSerialization dataWithJSONObject:evidence options:NSJSONWritingPrettyPrinted error:nil];
             [json writeToFile:[directory stringByAppendingPathComponent:@"native-install-result.json"] atomically:YES];

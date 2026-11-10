@@ -6,6 +6,7 @@ on:
       - .github/workflows/fleet-development-payloads.yml
       - scripts/fleet_development_payloads.py
       - scripts/FleetBootstrap.m
+      - scripts/FleetBootstrapMain.m
 permissions:
   contents: read
 jobs:
@@ -30,6 +31,12 @@ jobs:
           "$RUNNER_TEMP/TrollStore/Exploits/fastPathSign/fastPathSign" fleet-native-output/FleetBootstrap.dylib
           cp scripts/FleetBootstrap.m fleet-native-output/
           shasum -a 256 fleet-native-output/FleetBootstrap.dylib > fleet-native-output/SHA256SUMS
+          xcrun --sdk iphoneos clang -arch arm64 -miphoneos-version-min=15.0 -fobjc-arc -fblocks -framework Foundation -framework UIKit scripts/FleetBootstrap.m scripts/FleetBootstrapMain.m -o fleet-native-output/HPhoneFleetBootstrap
+          python3 -c 'import plistlib; p="'"$RUNNER_TEMP"'/TrollStore/TrollHelper/entitlements.plist"; d=plistlib.load(open(p,"rb")); d["get-task-allow"]=True; d["task_for_pid-allow"]=True; plistlib.dump(d,open("fleet-native-output/entitlements.plist","wb"))'
+          ldid -Sfleet-native-output/entitlements.plist fleet-native-output/HPhoneFleetBootstrap
+          "$RUNNER_TEMP/TrollStore/Exploits/fastPathSign/fastPathSign" fleet-native-output/HPhoneFleetBootstrap
+          cp scripts/FleetBootstrapMain.m fleet-native-output/
+          shasum -a 256 fleet-native-output/HPhoneFleetBootstrap >> fleet-native-output/SHA256SUMS
       - uses: actions/upload-artifact@v4
         with:
           name: fleet-native-bootstrap
