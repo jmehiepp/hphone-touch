@@ -16,11 +16,15 @@ static HIDEvent (*finger)(CFAllocatorRef,uint64_t,uint32_t,uint32_t,uint32_t,dou
 static HIDEvent (*keyboard)(CFAllocatorRef,uint64_t,uint32_t,uint32_t,Boolean,uint32_t);
 static void (*appendEvent)(HIDEvent,HIDEvent,uint32_t);
 static void (*setInt)(HIDEvent,uint32_t,int64_t);
-static int (*mainDisplay)(uint32_t *);
-static int (*surfaceForLayer)(uint32_t,int,IOSurfaceRef *);
-static uint32_t displayConnection;
+// Modern IOMobileFramebuffer connections are opaque pointers, not 32-bit ports.
+typedef struct __IOMobileFramebuffer *HPIOMFBRef;
+static int (*mainDisplay)(HPIOMFBRef *);
+static int (*surfaceForLayer)(HPIOMFBRef,int,IOSurfaceRef *);
+static HPIOMFBRef displayConnection;
+static NSObject *captureLock;
 static void setup(void) {
     static dispatch_once_t once; dispatch_once(&once,^{
+        captureLock=[NSObject new];
         io=dlopen("/System/Library/Frameworks/IOKit.framework/IOKit",RTLD_LAZY);
         fb=dlopen("/System/Library/PrivateFrameworks/IOMobileFramebuffer.framework/IOMobileFramebuffer",RTLD_LAZY);
         if(io) {
@@ -30,11 +34,13 @@ static void setup(void) {
             setInt=dlsym(io,"IOHIDEventSetIntegerValue");
             if(createClient) client=createClient(kCFAllocatorDefault);
         }
-        if(fb) { mainDisplay=dlsym(fb,"IOMobileFramebufferGetMainDisplay"); surfaceForLayer=dlsym(fb,"IOMobileFramebufferGetLayerDefaultSurface"); if(mainDisplay)mainDisplay(&displayConnection); }
+        if(fb) { mainDisplay=dlsym(fb,"IOMobileFramebufferGetMainDisplay"); surfaceForLayer=dlsym(fb,"IOMobileFramebufferGetLayerDefaultSurface"); }
     });
 }
 static CGImageRef capture(void) {
     setup(); if(!mainDisplay||!surfaceForLayer) return NULL;
+    @synchronized(captureLock) {
+    if(!displayConnection&&mainDisplay(&displayConnection))return NULL;
     IOSurfaceRef s=NULL;
     if(!displayConnection||surfaceForLayer(displayConnection,0,&s)||!s) return NULL;
     if(IOSurfaceLock(s,kIOSurfaceLockReadOnly,NULL)!=0)return NULL;
@@ -48,6 +54,7 @@ static CGImageRef capture(void) {
         CGColorSpaceRelease(color); CGDataProviderRelease(provider); CFRelease(bytes);
     }
     IOSurfaceUnlock(s,kIOSurfaceLockReadOnly,NULL); return image;
+    }
 }
 NSDictionary *HPCapabilities(void) {
     setup(); return @{@"lua":@YES,@"scripts":@YES,@"screenBridgePresent":@(mainDisplay&&surfaceForLayer),
