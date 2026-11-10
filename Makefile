@@ -24,7 +24,6 @@ TWEAK_NAME = HPhoneOverlay
 HPhoneOverlay_FILES = overlay/HPhoneOverlay.m
 HPhoneOverlay_CFLAGS = -fobjc-arc
 HPhoneOverlay_FRAMEWORKS = UIKit Foundation
-HPhoneOverlay_FILTER_PLIST = overlay/HPhoneOverlay.plist
 include $(THEOS_MAKE_PATH)/tweak.mk
 after-stage::
 	mkdir -p $(THEOS_STAGING_DIR)/usr/share/hphone-touch
