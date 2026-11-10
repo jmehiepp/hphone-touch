@@ -16,6 +16,7 @@ static HIDEvent (*finger)(CFAllocatorRef,uint64_t,uint32_t,uint32_t,uint32_t,dou
 static HIDEvent (*keyboard)(CFAllocatorRef,uint64_t,uint32_t,uint32_t,Boolean,uint32_t);
 static void (*appendEvent)(HIDEvent,HIDEvent,uint32_t);
 static void (*setInt)(HIDEvent,uint32_t,int64_t);
+static void (*setSender)(HIDEvent,uint64_t);
 // Modern IOMobileFramebuffer connections are opaque pointers, not 32-bit ports.
 typedef struct __IOMobileFramebuffer *HPIOMFBRef;
 static int (*mainDisplay)(HPIOMFBRef *);
@@ -25,9 +26,11 @@ static void (*renderDisplay)(int,CFStringRef,IOSurfaceRef,int,int);
 static HPIOMFBRef displayConnection;
 static NSObject *captureLock;
 static NSDictionary *screenDiagnostics;
+static NSLock *ocrLock;
 static void setup(void) {
     static dispatch_once_t once; dispatch_once(&once,^{
         captureLock=[NSObject new];
+        ocrLock=[NSLock new];
         io=dlopen("/System/Library/Frameworks/IOKit.framework/IOKit",RTLD_LAZY);
         fb=dlopen("/System/Library/PrivateFrameworks/IOMobileFramebuffer.framework/IOMobileFramebuffer",RTLD_LAZY);
         quartz=dlopen("/System/Library/Frameworks/QuartzCore.framework/QuartzCore",RTLD_LAZY);
@@ -37,6 +40,7 @@ static void setup(void) {
             digitizer=dlsym(io,"IOHIDEventCreateDigitizerEvent"); finger=dlsym(io,"IOHIDEventCreateDigitizerFingerEvent");
             keyboard=dlsym(io,"IOHIDEventCreateKeyboardEvent"); appendEvent=dlsym(io,"IOHIDEventAppendEvent");
             setInt=dlsym(io,"IOHIDEventSetIntegerValue");
+            setSender=dlsym(io,"IOHIDEventSetSenderID");
             if(createClient) client=createClient(kCFAllocatorDefault);
         }
         if(fb) { mainDisplay=dlsym(fb,"IOMobileFramebufferGetMainDisplay"); surfaceForLayer=dlsym(fb,"IOMobileFramebufferGetLayerDefaultSurface"); displaySize=dlsym(fb,"IOMobileFramebufferGetDisplaySize"); }
@@ -83,7 +87,7 @@ NSDictionary *HPCapabilities(void) {
     NSDictionary *diagnostics;setup();@synchronized(captureLock){diagnostics=screenDiagnostics?:@{@"stage":@"notTried"};}
     setup(); return @{@"lua":@YES,@"scripts":@YES,@"screenBridgePresent":@(mainDisplay&&surfaceForLayer),
         @"touchBridgePresent":@(client&&digitizer&&finger&&appendEvent&&dispatchEvent),@"keyBridgePresent":@(client&&keyboard&&dispatchEvent),
-        @"screenLastCheck":diagnostics,@"deviceValidation":@"required",@"version":@"0.1.3"};
+        @"screenLastCheck":diagnostics,@"deviceValidation":@"required",@"version":@"0.1.4"};
 }
 NSData *HPScreenshot(void) {
     CGImageRef image=capture(); if(!image) return nil;
@@ -92,23 +96,29 @@ NSData *HPScreenshot(void) {
     BOOL ok=CGImageDestinationFinalize(dst); CFRelease(dst); CGImageRelease(image); return ok?data:nil;
 }
 NSArray *HPOCR(void) {
+    setup();if(![ocrLock tryLock])return nil;
+    @try {
     CGImageRef image=capture(); if(!image) return nil;
     VNRecognizeTextRequest *request=[VNRecognizeTextRequest new]; request.recognitionLevel=VNRequestTextRecognitionLevelAccurate;
+    request.usesCPUOnly=YES;
     VNImageRequestHandler *handler=[[VNImageRequestHandler alloc] initWithCGImage:image options:@{}]; NSError *error=nil;
     BOOL ok=[handler performRequests:@[request] error:&error]; CGImageRelease(image); if(!ok)return nil;
     NSMutableArray *items=[NSMutableArray array];
     for(VNRecognizedTextObservation *ob in request.results) {
         VNRecognizedText *text=[[ob topCandidates:1] firstObject]; if(text) [items addObject:@{@"text":text.string,@"confidence":@(text.confidence),@"x":@(ob.boundingBox.origin.x),@"y":@(ob.boundingBox.origin.y),@"w":@(ob.boundingBox.size.width),@"h":@(ob.boundingBox.size.height)}];
     } return items;
+    } @catch(NSException *exception) {return nil;} @finally {[ocrLock unlock];}
 }
 static BOOL touch(double x,double y,BOOL down) {
     setup(); if(!client||!digitizer||!finger||!appendEvent||!dispatchEvent)return NO;
     CGImageRef im=capture(); if(!im)return NO; double w=CGImageGetWidth(im),h=CGImageGetHeight(im); CGImageRelease(im);
     if(!isfinite(x)||!isfinite(y)||x<0||y<0||x>=w||y>=h)return NO;
-    HIDEvent parent=digitizer(NULL,mach_absolute_time(),3,0,0,7,0,x/w,y/h,0,0,0,down,down,0);
-    HIDEvent child=finger(NULL,mach_absolute_time(),1,2,7,x/w,y/h,0,down?1:0,0,down,down,0);
+    uint32_t parentMask=down?0x23:0x27;
+    HIDEvent parent=digitizer(NULL,mach_absolute_time(),3,1u<<22,1,parentMask,0,x/w,y/h,0,0,0,false,false,0);
+    HIDEvent child=finger(NULL,mach_absolute_time(),3,2,3,x/w,y/h,0,0,0,down,down,0);
     if(!parent||!child) {if(parent)CFRelease(parent);if(child)CFRelease(child);return NO;}
-    if(setInt)setInt(parent,0xb0019,1);
+    if(setInt){setInt(parent,4,1);setInt(parent,0xb0019,1);}
+    if(setSender)setSender(parent,UINT64_C(0x8000000817319372));
     appendEvent(parent,child,0); dispatchEvent(client,parent); CFRelease(child);CFRelease(parent); return YES;
 }
 BOOL HPTap(double x,double y) { if(!touch(x,y,YES))return NO;usleep(50000);return touch(x,y,NO); }
