@@ -100,7 +100,7 @@ static BOOL HPOverlayBool(id value){return [value respondsToSelector:@selector(b
     if(!self.presentedViewController)[self request:@"ui" body:nil completion:^(NSDictionary *result){NSArray *events=result[@"events"];if([events isKindOfClass:NSArray.class])for(NSDictionary *event in events){if(self.presentedViewController)break;if([event isKindOfClass:NSDictionary.class])@try{[self handle:event];}@catch(NSException *exception){/* Reject a malformed owner event without crashing SpringBoard. */}}}];
 }
 - (void)show:(UIAlertController *)controller {
-    if(!self.view.window.isKeyWindow)self.previousKeyWindow=UIApplication.sharedApplication.keyWindow;
+    if(!self.view.window.isKeyWindow){for(UIScene *scene in UIApplication.sharedApplication.connectedScenes)if([scene isKindOfClass:UIWindowScene.class])for(UIWindow *window in ((UIWindowScene *)scene).windows)if(window.isKeyWindow)self.previousKeyWindow=window;}
     [self presentViewController:controller animated:YES completion:^{[self.view.window makeKeyWindow];}];
 }
 - (void)message:(NSString *)text {
