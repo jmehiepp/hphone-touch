@@ -9,11 +9,37 @@
 #include <unistd.h>
 #include <mach/mach_time.h>
 #include <math.h>
+#import <objc/message.h>
 extern char **environ;
 
 static NSString *const directory = @"/var/mobile/Media/RootHideFleet";
 static NSString *const officialHelperSHA = @"3634607f8165fb41c6844cb0b7608f38ee1f51c2e96e353ed13d4c76a28aa1bd";
 static NSString *const developmentIPASHA = @"22b48e78111d2885c621c36fb4bac6c042fed7ea50de84b0f842943129742d65";
+
+// Runs in the temporary platform helper, which has container-manager access.
+// House Arrest cannot vend a TrollStore app registered as a System app.
+static BOOL prepareRootHideSileo(void) {
+    Class proxyClass=NSClassFromString(@"LSApplicationProxy");
+    SEL lookup=NSSelectorFromString(@"applicationProxyForIdentifier:");
+    if(!proxyClass||![proxyClass respondsToSelector:lookup])return NO;
+    id proxy=((id(*)(id,SEL,id))objc_msgSend)(proxyClass,lookup,@"com.opa334.Dopamine-roothide");
+    SEL dataSelector=NSSelectorFromString(@"dataContainerURL");
+    if(![proxy respondsToSelector:dataSelector])return NO;
+    NSURL *url=((id(*)(id,SEL))objc_msgSend)(proxy,dataSelector);
+    if(![url isKindOfClass:NSURL.class]||!url.isFileURL)return NO;
+    NSString *base=url.URLByResolvingSymlinksInPath.path;
+    if(![base hasPrefix:@"/private/var/mobile/Containers/Data/Application/"] && ![base hasPrefix:@"/var/mobile/Containers/Data/Application/"])return NO;
+    NSString *preferencesDirectory=[base stringByAppendingPathComponent:@"Library/Preferences"];
+    NSString *path=[preferencesDirectory stringByAppendingPathComponent:@"com.opa334.Dopamine.plist"];
+    NSMutableDictionary *preferences=[[NSDictionary dictionaryWithContentsOfFile:path] mutableCopy];
+    if(!preferences && [[NSFileManager defaultManager] fileExistsAtPath:path])return NO;
+    if(!preferences)preferences=[NSMutableDictionary new];
+    if([preferences[@"removeJailbreakEnabled"] boolValue])return NO;
+    preferences[@"enabledPkgManagers"]=@[@"org.coolstar.SileoStore"];
+    if(![[NSFileManager defaultManager] createDirectoryAtPath:preferencesDirectory withIntermediateDirectories:YES attributes:nil error:nil])return NO;
+    if(![preferences writeToFile:path atomically:YES])return NO;
+    return [[NSDictionary dictionaryWithContentsOfFile:path] isEqualToDictionary:preferences];
+}
 
 static BOOL verify(NSString *path, NSString *sha) {
     NSData *data = [NSData dataWithContentsOfFile:path options:NSDataReadingMappedIfSafe error:nil];
@@ -113,7 +139,10 @@ __attribute__((constructor)) static void fleetBootstrap(void) {
             }
             if(input){integrity=YES;result=inputEvent(action);}
             else if (integrity && chmod(helper.fileSystemRepresentation, 0755) == 0) result = rootCommand(helper, command, argument);
+            BOOL sileoPrepared=NO;
+            if(result==0 && [action isEqualToString:@"install-pinned-roothide"])sileoPrepared=prepareRootHideSileo();
             NSDictionary *evidence = @{@"action":action, @"integrity_verified":@(integrity),
+                                      @"sileo_prepared":@(sileoPrepared),
                                       @"exit_code":@(result), @"finished_at":@([[NSDate date] timeIntervalSince1970])};
             NSData *json = [NSJSONSerialization dataWithJSONObject:evidence options:NSJSONWritingPrettyPrinted error:nil];
             [json writeToFile:[directory stringByAppendingPathComponent:@"native-install-result.json"] atomically:YES];
