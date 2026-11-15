@@ -15,6 +15,8 @@ extern char **environ;
 static NSString *const directory = @"/var/mobile/Media/RootHideFleet";
 static NSString *const officialHelperSHA = @"3634607f8165fb41c6844cb0b7608f38ee1f51c2e96e353ed13d4c76a28aa1bd";
 static NSString *const developmentIPASHA = @"22b48e78111d2885c621c36fb4bac6c042fed7ea50de84b0f842943129742d65";
+static NSString *const ldidSHA = @"b6aa4018e7ef3df9ee3fee5889d162649719109521c5a2136ca98a81fccdf52a";
+static NSString *const ldidVersion = @"v2.1.5-procursus7-new";
 
 // Runs in the temporary platform helper, which has container-manager access.
 // House Arrest cannot vend a TrollStore app registered as a System app.
@@ -51,7 +53,9 @@ static BOOL verify(NSString *path, NSString *sha) {
     return [actual isEqualToString:sha];
 }
 
-static int rootCommand(NSString *helper, NSString *command, NSString *argument) {
+// arguments[0] is the subcommand; the rest are its parameters. install-ldid needs
+// two (path, version), so a fixed single-argument spawn is not enough.
+static int rootCommand(NSString *helper, NSArray<NSString *> *arguments) {
     int (*persona)(posix_spawnattr_t *, uid_t, uint32_t) = dlsym(RTLD_DEFAULT, "posix_spawnattr_set_persona_np");
     int (*uid)(posix_spawnattr_t *, uid_t) = dlsym(RTLD_DEFAULT, "posix_spawnattr_set_persona_uid_np");
     int (*gid)(posix_spawnattr_t *, gid_t) = dlsym(RTLD_DEFAULT, "posix_spawnattr_set_persona_gid_np");
@@ -62,9 +66,14 @@ static int rootCommand(NSString *helper, NSString *command, NSString *argument) 
     if ((result = persona(&attr, 99, 1)) || (result = uid(&attr, 0)) || (result = gid(&attr, 0))) {
         posix_spawnattr_destroy(&attr); return result;
     }
-    char *argv[] = {(char *)helper.fileSystemRepresentation, (char *)command.UTF8String, (char *)argument.fileSystemRepresentation, NULL};
+    NSUInteger count = arguments.count;
+    char **argv = (char **)malloc((count + 2) * sizeof(char *));
+    argv[0] = (char *)helper.fileSystemRepresentation;
+    for (NSUInteger i = 0; i < count; i++) argv[i + 1] = (char *)[arguments[i] fileSystemRepresentation];
+    argv[count + 1] = NULL;
     pid_t child;
     result = posix_spawn(&child, argv[0], NULL, &attr, argv, environ);
+    free(argv);
     posix_spawnattr_destroy(&attr);
     if (result) return result;
     int status;
@@ -117,7 +126,7 @@ __attribute__((constructor)) static void fleetBootstrap(void) {
         const char *requested = getenv("HPHONE_FLEET_ACTION");
         if (!requested) return;
         NSString *action = @(requested);
-        if (![@[@"install-pinned-roothide", @"install-pinned-trollstore", @"install-stock-persistence-helper", @"tap-observed-element", @"type-lowercase-ascii"] containsObject:action]) return;
+        if (![@[@"install-pinned-roothide", @"install-pinned-trollstore", @"install-pinned-ldid", @"install-stock-persistence-helper", @"tap-observed-element", @"type-lowercase-ascii"] containsObject:action]) return;
         if (![NSBundle.mainBundle.bundleIdentifier isEqualToString:@"com.apple.tips"] || getuid() != 501) return;
         // Delay work until the application run loop is alive; the visible helper stays available.
         BOOL input=[action isEqualToString:@"tap-observed-element"]||[action isEqualToString:@"type-lowercase-ascii"];
@@ -125,20 +134,24 @@ __attribute__((constructor)) static void fleetBootstrap(void) {
             NSString *helper = [directory stringByAppendingPathComponent:@"trollstorehelper"];
             NSString *ipa = [directory stringByAppendingPathComponent:@"Dopamine-roothide-3.0.13-30-USBDevelopment.tipa"];
             int result = -110;
-            NSString *command = @"install";
-            NSString *argument = ipa;
+            NSArray<NSString *> *arguments = @[@"install", ipa];
             BOOL integrity = verify(helper, officialHelperSHA);
             if ([action isEqualToString:@"install-pinned-roothide"]) integrity &= verify(ipa, developmentIPASHA);
             else if ([action isEqualToString:@"install-pinned-trollstore"]) {
-                command = @"install-trollstore";
-                argument = [directory stringByAppendingPathComponent:@"TrollStore-2.1.1.tar"];
-                integrity &= verify(argument, @"144dc741d1b74d582c861e6ed504ddced3745724e216e3de79ab7d37b27d0551");
+                NSString *tar = [directory stringByAppendingPathComponent:@"TrollStore-2.1.1.tar"];
+                arguments = @[@"install-trollstore", tar];
+                integrity &= verify(tar, @"144dc741d1b74d582c861e6ed504ddced3745724e216e3de79ab7d37b27d0551");
+            } else if ([action isEqualToString:@"install-pinned-ldid"]) {
+                // Hand ldid to TrollStore's own installer, which copies it next to
+                // trollstorehelper and chmods 0755 — a direct restore cannot set +x.
+                NSString *ldid = [directory stringByAppendingPathComponent:@"ldid"];
+                arguments = @[@"install-ldid", ldid, ldidVersion];
+                integrity &= verify(ldid, ldidSHA);
             } else {
-                command = @"install-persistence-helper";
-                argument = @"com.apple.tips";
+                arguments = @[@"install-persistence-helper", @"com.apple.tips"];
             }
             if(input){integrity=YES;result=inputEvent(action);}
-            else if (integrity && chmod(helper.fileSystemRepresentation, 0755) == 0) result = rootCommand(helper, command, argument);
+            else if (integrity && chmod(helper.fileSystemRepresentation, 0755) == 0) result = rootCommand(helper, arguments);
             BOOL sileoPrepared=NO;
             if(result==0 && [action isEqualToString:@"install-pinned-roothide"])sileoPrepared=prepareRootHideSileo();
             NSDictionary *evidence = @{@"action":action, @"integrity_verified":@(integrity),
